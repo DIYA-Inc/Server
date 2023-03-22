@@ -1,0 +1,5 @@
+.directory
+.vscode/
+__pycache__/
+thumbs.db
+data/
