@@ -22,9 +22,7 @@ To stop the server send a KeyboardInterrupt (ctrl + C).
 
 ## Dependencies
 
-- Python 3.7+
-- Flask
-- Waitress (optional)
+Python 3.7+, all required packages are in `requirements.txt`, to install them all, run `python -m pip install -r requirements.txt`
 
 ## Misc
 

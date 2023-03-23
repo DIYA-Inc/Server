@@ -4,9 +4,7 @@ import flask
 
 api = flask.Blueprint("api", __name__)
 
-@api.route("/", methods=["GET"])
-def index():
-    return "Hello, world!"
+# TODO: Add API routes here
 
 if "__main__" == __name__:
     import database

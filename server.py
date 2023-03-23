@@ -2,7 +2,9 @@
 
 import flask
 import logging
+import markdown
 import os
+from pygments.formatters import HtmlFormatter
 import sys
 
 from api import api
@@ -28,6 +30,42 @@ db.executeScript("databaseStructure.sql")
 app = flask.Flask(__name__)
 api.db = db
 app.register_blueprint(api)
+
+
+mdCache = {}
+def getMarkdown(filename):
+    """Get the markdown from a file and return it as HTML."""
+    if filename in mdCache:
+        return mdCache[filename]
+
+    with open(filename, "r") as f:
+        file = f.read()
+
+    if not filename.endswith(".md"):
+        mdCache[filename] = file
+        return file
+
+    md = markdown.markdown(file, extensions=[
+        "fenced_code", "codehilite", "toc", "nl2br"])
+
+    formatter = HtmlFormatter(style="emacs", full=True, cssclass="codehilite")
+    css = formatter.get_style_defs() + getMarkdown("style.css")
+
+    mdCache[filename] = "<style>" + css + "</style>" + md
+    return mdCache[filename]
+
+
+@app.route("/", methods=["GET"])
+def index():
+    """Return the index page"""
+    return getMarkdown("index.md")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """Return the api reference"""
+    return getMarkdown("apiReference.md"), 404
+
 
 # Use waitress as the WSGI server if it is installed,
 # but use built-in if it isnt, or if --werkzeug argument.
