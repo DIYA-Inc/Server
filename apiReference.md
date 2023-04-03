@@ -13,7 +13,9 @@ Request:
 ```json
 {
     "email": "case insensitive",
-    "password": "case sensitive"
+    "password": "case sensitive",
+    "premium": true,
+    "admin": false
 }
 ```
 
@@ -162,6 +164,13 @@ Response:
     "description": "Book Description",
     "cover": "Book Cover URL",
     "fileURL": "Book File URL",
+    "publisher": "Book Publisher",
+    "published": "2023-03-31T00:00:00.000Z",
+    "pages": 100,
+    "language": "English",
+    "genre": "Book Genre",
+    "catalogues": ["Book Catalogue List"],
+    "reading age": 18,
     "ISBN": "978-3-16-148410-0"
 }
 ```
@@ -189,6 +198,13 @@ Response:
         "description": "Book Description",
         "cover": "Book Cover URL",
         "fileURL": "Book File URL",
+        "publisher": "Book Publisher",
+        "published": "2023-03-31T00:00:00.000Z",
+        "pages": 100,
+        "language": "English",
+        "genre": "Book Genre",
+        "catalogues": ["Book Catalogue List"],
+        "reading age": 18,
         "ISBN": "978-3-16-148410-0"
     },
     {
@@ -198,6 +214,13 @@ Response:
         "description": "Book Description",
         "cover": "Book Cover URL",
         "fileURL": "Book File URL",
+        "publisher": "Book Publisher",
+        "published": "2023-03-31T00:00:00.000Z",
+        "pages": 100,
+        "language": "English",
+        "genre": "Book Genre",
+        "catalogues": ["Book Catalogue List"],
+        "reading age": 18,
         "ISBN": "978-3-16-148410-0"
     }
 ]
@@ -216,13 +239,20 @@ HTTP POST [/book/add](/book/add)
 ```
 
 Request:
-```
+```json
 {
     "title": "Book Title",
     "author": "Book Author",
     "description": "Book Description",
     "cover": "Book Cover URL",
     "fileURL": "Book File URL",
+    "publisher": "Book Publisher",
+    "published": "2023-03-31T00:00:00.000Z",
+    "pages": 100,
+    "language": "English",
+    "genre": "Book Genre",
+    "catalogues": ["Book Catalogue List"],
+    "reading age": 18,
     "ISBN": "978-3-16-148410-0"
 }
 ```
@@ -251,13 +281,20 @@ HTTP PUT [/book/edit/[bookID]](/book/edit)
 ```
 
 Request:
-```
+```json
 {
     "title": "Book Title",
     "author": "Book Author",
     "description": "Book Description",
     "cover": "Book Cover URL",
     "fileURL": "Book File URL",
+    "publisher": "Book Publisher",
+    "published": "2023-03-31T00:00:00.000Z",
+    "pages": 100,
+    "language": "English",
+    "genre": "Book Genre",
+    "catalogues": ["Book Catalogue List"],
+    "reading age": 18,
     "ISBN": "978-3-16-148410-0"
 }
 ```
