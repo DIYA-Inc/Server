@@ -22,23 +22,13 @@ for arg, var, default in [
     else:
         argv[var] = default
 
-# Set up database
-db = database(argv["dataDir"])
-db.executeScript("databaseStructure.sql")
-
-# Set up flask
-app = flask.Flask(__name__)
-api.db = db
-app.register_blueprint(api)
-
-
 mdCache = {}
 def getMarkdown(filename):
     """Get the markdown from a file and return it as HTML."""
     if filename in mdCache:
         return mdCache[filename]
 
-    with open(filename, "r") as f:
+    with open("static/" + filename, "r") as f:
         file = f.read()
 
     if not filename.endswith(".md"):
@@ -55,16 +45,34 @@ def getMarkdown(filename):
     return mdCache[filename]
 
 
-@app.route("/", methods=["GET"])
+static = flask.Blueprint("static", __name__)
+
+@static.route("/", methods=["GET"])
 def index():
     """Return the index page"""
     return getMarkdown("index.md")
 
 
-@app.errorhandler(404)
+@static.app_errorhandler(404)
 def page_not_found(e):
     """Return the api reference"""
     return getMarkdown("apiReference.md"), 404
+
+
+def createServer(dataDir=argv["dataDir"], filename="database.db"):
+    """Create a database and server object.
+    
+    Returns:
+        flask.Flask: The server object."""
+    app = flask.Flask(__name__)
+
+    db = database(dataDir, filename)
+    db.executeScript("databaseStructure.sql")
+    api.db = db
+    
+    app.register_blueprint(api)
+    app.register_blueprint(static)
+    return app
 
 
 # Use waitress as the WSGI server if it is installed,
@@ -89,6 +97,8 @@ if __name__ == "__main__":
         print("  --werkzeug        Use werkzeug instead of waitress")
         print("  --data-dir DIR    Set the directory where data is stored")
         exit(0)
+
+    app = createServer()
 
     # Run server
     if useWaitress:

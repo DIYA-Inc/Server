@@ -20,6 +20,10 @@ By default waitress will be used as the WSGI if it is installed and will use wer
 
 To stop the server send a KeyboardInterrupt (ctrl + C).
 
+To run the unit tests run:
+
+`./testing.py`
+
 ## Dependencies
 
 Python 3.7+, all required packages are in `requirements.txt`, to install them all, run `python -m pip install -r requirements.txt`
