@@ -13,9 +13,7 @@ Request:
 ```json
 {
     "email": "case insensitive",
-    "password": "case sensitive",
-    "premium": true,
-    "admin": false
+    "password": "case sensitive"
 }
 ```
 
@@ -26,6 +24,7 @@ Response:
 ```json
 {
     "success": true,
+    "premium": true,
     "admin": false
 }
 ```
@@ -48,12 +47,57 @@ Request:
 }
 ```
 
+Response:
+
+```json
+{
+    "success": true
+}
+```
+
 Response Status Codes:
 - `200` - Success
 - `409` - User already exists
 - `422` - Invalid JSON
 
-## Verify Account
+## Account Details
+
+HTTP GET [/account/details](/account/details)
+
+Get details about the current logged in user.
+
+Response:
+
+```json
+{
+    "email": "case insensitive",
+    "premium": true,
+    "admin": false,
+    "created": "2023-03-31 00:00:00",
+    "premiumExpires": "2023-05-31 00:00:00"
+}
+```
+
+Response Status Codes:
+- `200` - Success
+- `401` - Not Authorized
+
+## Logout
+
+HTTP GET [/account/logout](/account/logout)
+
+Response:
+
+```json
+{
+    "success": true
+}
+```
+
+Response Status Codes:
+- `200` - Success
+
+## Verify Account [NOT IMPLEMENTED]
 
 HTTP GET [/account/verify](/account/verify)
 
@@ -75,28 +119,7 @@ Response Status Codes:
 - `200` - Success
 - `401` - Not successful
 
-## Account Details
-
-HTTP GET [/account/details](/account/details)
-
-Response:
-
-```json
-{
-    "email": "case insensitive",
-    "premium": true,
-    "admin": false,
-    "verified": true,
-    "created": "2023-03-31T00:00:00.000Z",
-    "premiumExpires": "2023-05-31T00:00:00.000Z"
-}
-```
-
-Response Status Codes:
-- `200` - Success
-- `401` - Not successful
-
-## Update Account
+## Update Account [NOT IMPLEMENTED]
 
 HTTP PUT [/account/update](/account/update)
 
@@ -123,7 +146,7 @@ Response Status Codes:
 - `401` - Not Authorized
 - `422` - Invalid JSON
 
-## Delete Account
+## Delete Account [NOT IMPLEMENTED]
 
 HTTP DELETE [/account/update](/account/update)
 
@@ -148,9 +171,9 @@ Response Status Codes:
 - `401` - Not Authorized
 - `422` - Invalid JSON
 
-# Books
+# Books [NOT IMPLEMENTED]
 
-## Get Book
+## Get Book [NOT IMPLEMENTED]
 
 HTTP GET [/book/get/[bookID]](/book/get/0)
 
@@ -165,7 +188,7 @@ Response:
     "cover": "Book Cover URL",
     "fileURL": "Book File URL",
     "publisher": "Book Publisher",
-    "published": "2023-03-31T00:00:00.000Z",
+    "published": "2023-03-31 00:00:00",
     "pages": 100,
     "language": "English",
     "genre": "Book Genre",
@@ -179,7 +202,7 @@ Response Status Codes:
 - `200` - Success
 - `404` - Book not found
 
-## Search
+## Search [NOT IMPLEMENTED]
 
 HTTP GET [/book/search?q=[query]&c=[catalogue]&g=[genre]](/book/search)
 
@@ -199,7 +222,7 @@ Response:
         "cover": "Book Cover URL",
         "fileURL": "Book File URL",
         "publisher": "Book Publisher",
-        "published": "2023-03-31T00:00:00.000Z",
+        "published": "2023-03-31 00:00:00",
         "pages": 100,
         "language": "English",
         "genre": "Book Genre",
@@ -215,7 +238,7 @@ Response:
         "cover": "Book Cover URL",
         "fileURL": "Book File URL",
         "publisher": "Book Publisher",
-        "published": "2023-03-31T00:00:00.000Z",
+        "published": "2023-03-31 00:00:00",
         "pages": 100,
         "language": "English",
         "genre": "Book Genre",
@@ -230,7 +253,7 @@ Response Status Codes:
 - `200` - Success
 - `422` - Invalid JSON
 
-## Add Book
+## Add Book [NOT IMPLEMENTED]
 
 HTTP POST [/book/add](/book/add)
 
@@ -247,7 +270,7 @@ Request:
     "cover": "Book Cover URL",
     "fileURL": "Book File URL",
     "publisher": "Book Publisher",
-    "published": "2023-03-31T00:00:00.000Z",
+    "published": "2023-03-31 00:00:00",
     "pages": 100,
     "language": "English",
     "genre": "Book Genre",
@@ -272,7 +295,7 @@ Response Status Codes:
 - `404` - Book not found
 - `422` - Invalid JSON
 
-## Edit Book
+## Edit Book [NOT IMPLEMENTED]
 
 HTTP PUT [/book/edit/[bookID]](/book/edit)
 
@@ -289,7 +312,7 @@ Request:
     "cover": "Book Cover URL",
     "fileURL": "Book File URL",
     "publisher": "Book Publisher",
-    "published": "2023-03-31T00:00:00.000Z",
+    "published": "2023-03-31 00:00:00",
     "pages": 100,
     "language": "English",
     "genre": "Book Genre",
@@ -315,7 +338,7 @@ Response Status Codes:
 - `404` - Book not found
 - `422` - Invalid JSON
 
-## Delete Book
+## Delete Book [NOT IMPLEMENTED]
 
 HTTP DELETE [/book/delete/[bookID]](/book/delete)
 
@@ -337,11 +360,11 @@ Response Status Codes:
 - `404` - Book not found
 - `422` - Invalid JSON
 
-# Book Files
+# Book Files [NOT IMPLEMENTED]
 
 Book files are automatically deleted after a book is deleted at [Delete Book](#delete-book).
 
-## Get Book File
+## Get Book File [NOT IMPLEMENTED]
 
 HTTP GET [/file/book/[bookID]](/file/book/0)
 
@@ -351,7 +374,7 @@ Response Status Codes:
 - `200` - Success
 - `404` - Book not found
 
-## Get Book Cover
+## Get Book Cover [NOT IMPLEMENTED]
 
 HTTP GET [/file/cover/[bookID]](/file/cover/0)
 
@@ -361,7 +384,7 @@ Response Status Codes:
 - `200` - Success
 - `404` - Book not found
 
-## Upload Book File
+## Upload Book File [NOT IMPLEMENTED]
 
 HTTP PUT [/file/upload/[bookID]](/file/upload/0)
 

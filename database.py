@@ -63,19 +63,44 @@ class database:
         Returns: (tuple)
             (bool): Whether the user exists
             (bool): If the user has premium
-            (bool): If the user is an admin"""
+            (bool): If the user is an admin
+            (int): The user's ID"""
         email = email.lower()
         con, cur = self.connect()
         cur.execute("""
-            SELECT passwordHash, userAccessLevel
+            SELECT userID, passwordHash, userAccessLevel
             FROM users WHERE email = ?""",
             (email,))
         result = cur.fetchone()
         con.close()
-        if result and bcrypt.checkpw(password.encode("utf-8"), result[0]):
-                return (True, result[1] >= 1, result[1] >= 2)
-        return (False, False, False)
-            
+        if result and bcrypt.checkpw(password.encode("utf-8"), result[1]):
+                return (True, result[2] >= 1, result[2] >= 2, result[0])
+        return (False,)
+    
+    def getUserByID(self, userID):
+        """Get a user's details by their ID.
+        
+        Args:
+            userID (int): The ID of the user.
+        
+        Returns:
+            dict: The user's details."""
+        con, cur = self.connect()
+        cur.execute("""
+            SELECT email, userAccessLevel, created, premiumExpires
+            FROM users WHERE userID = ?""",
+            (userID,))
+        result = cur.fetchone()
+        con.close()
+        if result:
+            return {
+                "email": result[0],
+                "premium": result[1] >= 1,
+                "admin": result[1] >= 2,
+                "created": result[2],
+                "premiumExpires": result[3]
+            }
+        raise ValueError("User does not exist.")
 
 if __name__ == "__main__":
     db = database(os.path.join(os.path.dirname(__file__), "data"))

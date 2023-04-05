@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
     email               VARCHAR(128) NOT NULL,
     passwordHash        VARCHAR(60) NOT NULL,
     userAccessLevel     INTEGER NOT NULL DEFAULT 0,
+    created             DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     premiumExpires      DATETIME,
     PRIMARY KEY (userID AUTOINCREMENT),
     UNIQUE (email)
