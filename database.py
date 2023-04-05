@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import bcrypt
 import os
 import sqlite3
 
@@ -37,6 +38,44 @@ class database:
         con.commit()
         con.close()
 
+    def addUser(self, email, password):
+        """Add a user to the database.
+        
+        Args:
+            email (str): The email of the user.
+            password (str): The password of the user."""
+        email = email.lower()
+        hashedPassword = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+        con, cur = self.connect()
+        cur.execute(
+            "INSERT INTO users (email, passwordHash) VALUES (?, ?)",
+            (email, hashedPassword))
+        con.commit()
+        con.close()
+
+    def checkUser(self, email, password):
+        """Check if a user exists in the database.
+        
+        Args:
+            email (str): The email of the user.
+            password (str): The password of the user.
+        
+        Returns: (tuple)
+            (bool): Whether the user exists
+            (bool): If the user has premium
+            (bool): If the user is an admin"""
+        email = email.lower()
+        con, cur = self.connect()
+        cur.execute("""
+            SELECT passwordHash, userAccessLevel
+            FROM users WHERE email = ?""",
+            (email,))
+        result = cur.fetchone()
+        con.close()
+        if result and bcrypt.checkpw(password.encode("utf-8"), result[0]):
+                return (True, result[1] >= 1, result[1] >= 2)
+        return (False, False, False)
+            
 
 if __name__ == "__main__":
     db = database(os.path.join(os.path.dirname(__file__), "data"))

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS users (
     userID              INTEGER NOT NULL,
     email               VARCHAR(128) NOT NULL,
     passwordHash        VARCHAR(60) NOT NULL,
-    userAccessLEvel     INTEGER NOT NULL DEFAULT 0,
+    userAccessLevel     INTEGER NOT NULL DEFAULT 0,
     premiumExpires      DATETIME,
     PRIMARY KEY (userID AUTOINCREMENT),
     UNIQUE (email)

@@ -63,6 +63,45 @@ class TestDatabase(TestUtils):
         for table in ("users", "verificationTokens", "books", "bookCatalogues", "bookCatalogueLink"):
             self.assertIn((table,), tables)
 
+    def testRegister(self, email="joe@joeblakeb.com", password="Password123"):
+        """Check that the add user function works correctly."""
+        self.db.addUser(email, password)
+        con, cur = self.db.connect()
+        cur.execute("SELECT * FROM users")
+        users = cur.fetchall()
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0][1], email)
+        self.assertNotEqual(users[0][2], password)
+
+    def testLogin(self):
+        """Check that the login function works correctly."""
+        email, password = "floppa@diya.ink", "B1ngus"
+        self.testRegister(email, password)
+        self.assertEqual(
+            self.db.checkUser(email.upper(), password),
+            (True, False, False), "Correct login")
+        
+        con, cur = self.db.connect()
+        cur.execute("UPDATE users SET userAccessLevel = 1 WHERE email = ?", (email,))
+        con.commit()
+        self.assertEqual(
+            self.db.checkUser(email, password),
+            (True, True, False), "Premium account")
+
+        cur.execute("UPDATE users SET userAccessLevel = 2 WHERE email = ?", (email,))
+        con.commit()
+        self.assertEqual(
+            self.db.checkUser(email, password),
+            (True, True, True), "Admin account")
+
+        self.assertEqual(
+            self.db.checkUser(email, password.upper()),
+            (False, False, False), "Incorrect password")
+        
+        self.assertEqual(
+            self.db.checkUser("example@test.com", password),
+            (False, False, False), "Incorrect email")
+
 
 if __name__ == "__main__":
     unittest.main()
