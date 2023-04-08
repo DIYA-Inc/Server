@@ -10,6 +10,34 @@ from database import database
 from server import createServer
 
 
+sampleBookMetadata = [
+    {
+        "title": "1984",
+        "author": "George Orwell",
+        "isbn": "978-0451524935"
+    },
+    {
+        "title": "Learning Android",
+        "author": "Marko Gargenta",
+        "isbn": "978-1449331818",
+        "publisher": "O'Reilly Media, Inc.",
+        "publicationDate": "2011-12-19",
+        "description": "Make android apps innit",
+        "pageCount": 400,
+        "language": "en",
+        "genre": "Programming",
+        "readingAge": 16,
+        "catalogues": ["Computers", "Programming"]
+    },
+    {
+        "title": "Linux Bible",
+        "author": "Christopher Negus",
+        "isbn": "978-1118999875",
+        "catalogues": ["Computers", "Linux"]
+    }
+]
+
+
 class TestUtils(unittest.TestCase):
     @classmethod
     def setUpClass(self):
@@ -172,6 +200,50 @@ class TestDatabase(TestUtils):
         self.assertEqual(
             self.db.checkUser("example@test.com", password),
             (False,), "Incorrect email")
+        
+    def testAddBookMetadata(self):
+        """Tests getting a book from the database."""
+        for i in range(len(sampleBookMetadata)):
+            self.assertEqual(i+1,
+                self.db.addBookMetadata(**sampleBookMetadata[i]))
+        con, cur = self.db.connect()
+        cur.execute("SELECT * FROM books")
+        books = cur.fetchall()
+        self.assertEqual(len(books), len(sampleBookMetadata))
+        con.close()
+        
+    def testGetBookMetadata(self):
+        """Tests getting a book from the database."""
+        self.testAddBookMetadata()
+        for i in range(len(sampleBookMetadata)):
+            book = self.db.getBookMetadata(i+1)
+            for key in sampleBookMetadata[i]:
+                self.assertEqual(book[key], sampleBookMetadata[i][key])
+
+    def testDeleteBook(self):
+        """Tests deleting a book from the database."""
+        self.testAddBookMetadata()
+        for i in (1,2):
+            otherBook = self.db.getBookMetadata(i+1)
+            self.db.deleteBook(i)
+            self.assertRaises(Exception, self.db.getBookMetadata, i)
+            self.assertEqual(self.db.getBookMetadata(i+1), otherBook)
+
+    def testCatalogue(self):
+        """Checks that catalogues are managed automatically."""
+        self.testAddBookMetadata()
+        con, cur = self.db.connect()
+        cur.execute("SELECT * FROM bookCatalogues")
+        catalogues = [c[1] for c in cur.fetchall()]
+        self.assertEqual(catalogues, ["Computers", "Programming", "Linux"])
+        for i in (2, 1):
+            self.db.deleteBook(i)
+            cur.execute("SELECT * FROM bookCatalogues")
+            catalogues = [c[1] for c in cur.fetchall()]
+            self.assertEqual(catalogues, ["Computers", "Linux"])
+        self.db.deleteBook(3)
+        cur.execute("SELECT * FROM bookCatalogues")
+        self.assertEqual(cur.fetchall(), [])
 
 
 if __name__ == "__main__":

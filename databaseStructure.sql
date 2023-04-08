@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS books (
     bookID              INTEGER NOT NULL,
     bookName            VARCHAR(128) NOT NULL,
     author              VARCHAR(64) NOT NULL,
-    ISBN                VARCHAR(13) NOT NULL,
+    ISBN                VARCHAR(16) NOT NULL,
     publisher           VARCHAR(64),
     publicationDate     DATE,
     pageCount           INTEGER,
@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS books (
 CREATE TABLE IF NOT EXISTS bookCatalogues (
     catalogueID         INTEGER NOT NULL,
     catalogueName       VARCHAR(64) NOT NULL,
-    catalogueDesc       TEXT,
-    PRIMARY KEY (catalogueID AUTOINCREMENT)
+    PRIMARY KEY (catalogueID AUTOINCREMENT),
+    UNIQUE (catalogueName)
 );
 
 CREATE TABLE IF NOT EXISTS bookCatalogueLink (

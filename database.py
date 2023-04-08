@@ -102,6 +102,99 @@ class database:
             }
         raise ValueError("User does not exist.")
 
+    def addBookMetadata(self, title, author, isbn,
+            publisher=None, publicationDate=None, description=None,
+            pageCount=None, language=None, genre=None,
+            readingAge=None, catalogues=[]):
+        """Add book metadata to the database.
+
+        Args:
+            title(str): The title of the book.
+            author(str): The author of the book.
+            isbn(str): The ISBN of the book.
+            publisher(str): The publisher of the book. (optional)
+            publicationDate(str): The publication date of the book. (optional)
+            description(str): The description of the book. (optional)
+            pageCount(int): The number of pages in the book. (optional)
+            language(str): The language of the book. (optional)
+            genre(str): The genre of the book. (optional)
+            readingAge(int): The recommended reading age of the book. (optional)
+            catalogues(list of str): The catalogues the book is in. (optional)
+        Returns:
+            int: The ID of the book."""
+        con, cur = self.connect()
+        cur.execute("""
+            INSERT INTO books (
+                bookName, author, ISBN, publisher, publicationDate,
+                description, pageCount, language, genre, readingAge
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (title, author, isbn, publisher, publicationDate,
+                description, pageCount, language, genre, readingAge))
+        bookID = cur.lastrowid
+        for catalogue in catalogues:
+            cur.execute("""INSERT OR IGNORE INTO bookCatalogues (
+                catalogueName) VALUES (?)""", (catalogue,))
+            cur.execute("""
+                INSERT INTO bookCatalogueLink (
+                    bookID, catalogueID
+                ) VALUES ( ?,
+                    (SELECT catalogueID FROM bookCatalogues WHERE catalogueName = ?)
+                )""", (bookID, catalogue))
+        con.commit()
+        con.close()
+        return bookID
+    
+    def getBookMetadata(self, bookID):
+        """Get book metadata from the database.
+
+        Args:
+            bookID(int): The ID of the book.
+        Returns:
+            dict: The book's metadata."""
+        con, cur = self.connect()
+        cur.execute("""
+            SELECT bookName, author, ISBN, publisher, publicationDate,
+                description, pageCount, language, genre, readingAge
+            FROM books WHERE bookID = ?""", (bookID,))
+        result = cur.fetchone()
+        if result:
+            cur.execute("""
+                SELECT catalogueName
+                FROM bookCatalogues
+                INNER JOIN bookCatalogueLink ON bookCatalogues.catalogueID = bookCatalogueLink.catalogueID
+                WHERE bookID = ?""", (bookID,))
+            catalogues = [catalogue[0] for catalogue in cur.fetchall()]
+        con.close()
+        if result:
+            return {
+                "bookID": bookID,
+                "title": result[0],
+                "author": result[1],
+                "isbn": result[2],
+                "publisher": result[3],
+                "publicationDate": result[4],
+                "description": result[5],
+                "pageCount": result[6],
+                "language": result[7],
+                "genre": result[8],
+                "readingAge": result[9],
+                "catalogues": catalogues
+            }
+        raise ValueError("404: Book does not exist.")
+    
+    def deleteBook(self, bookID):
+        """Delete book metadata from the database.
+
+        Args:
+            bookID(int): The ID of the book."""
+        con, cur = self.connect()
+        cur.execute("DELETE FROM books WHERE bookID = ?", (bookID,))
+        cur.execute("DELETE FROM bookCatalogueLink WHERE bookID = ?", (bookID,))
+        cur.execute("DELETE FROM bookCatalogues WHERE catalogueID NOT IN (SELECT catalogueID FROM bookCatalogueLink)")
+        con.commit()
+        con.close()
+
+
 if __name__ == "__main__":
     db = database(os.path.join(os.path.dirname(__file__), "data"))
     db.executeScript("databaseStructure.sql")
