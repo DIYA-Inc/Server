@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include("parts/meta.html") %}
+    <title>Account</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <p>Email: {{ user["email"] }}</p>
+    <p>Admin: {{ user["admin"] }}</p>
+    <p>Created: {{ user["created"] }}</p>
+    <p>Premium: {{ user["premium"] }}</p>
+    <p>Premium Expires: {{ user["premiumExpires"] }}</p>
+</body>
+
+</html>

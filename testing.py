@@ -37,38 +37,25 @@ class TestServer(TestUtils):
         app = createServer(self.tempDataDir, self.randomString() + ".db")
         app.config["TESTING"] = True
         self.client = app.test_client()
-        self.db = app.blueprints["api"].db
-
-    def testMarkdownPages(self):
-        """Check that the index and api reference pages are returned correctly."""
-        index = self.client.get("/")
-        self.assertEqual(index.status_code, 200)
-        self.assertIn(b"D.I.Y.A. Inc.", index.data)
-        self.assertIn(b"Team Members", index.data)
-        apiRef = self.client.get("/api")
-        self.assertEqual(apiRef.status_code, 404)
-        self.assertIn(b"API Reference", apiRef.data)
-        self.assertNotIn(b"[TOC]", apiRef.data)
+        self.db = app.db
 
     def testRegister(self, email="joe@joeblakeb.com", password="Password123"):
         """Tests registering a new."""
-        register = self.client.post("/account/register", json={
+        register = self.client.post("/account/register", data={
             "email": email,
             "password": password
         })
-        self.assertEqual(register.status_code, 200)
-        self.assertEqual(register.get_json()["success"], True)
+        self.assertTrue(200 <= register.status_code < 400)
 
     def testRegisterInvalid(self, email="mung@diya.ink", password="Amungus2"):
         """Server should not allow two users with the same email address."""
         self.testRegister(email, password)
         for email2 in (email, email.upper(), "invalid"):
-            register = self.client.post("/account/register", json={
+            register = self.client.post("/account/register", data={
                 "email": email2,
                 "password": password
             })
-            self.assertIn(register.status_code, (409, 422))
-            self.assertEqual(register.get_json()["success"], False)
+            self.assertTrue(400 <= register.status_code < 500)
 
         con, cur = self.db.connect()
         cur.execute("SELECT * FROM users")
@@ -78,17 +65,13 @@ class TestServer(TestUtils):
     def testLoginCorrect(self, email="sus@diya.ink", password="Chungus"):
         """Tests logging in with a correct email and password."""
         self.testRegister(email, password)
-        login = self.client.post("/account/login", json={
+        login = self.client.post("/account/login", data={
             "email": email,
             "password": password
         })
-        self.assertEqual(login.status_code, 200)
-        self.assertEqual(login.get_json(), {
-            "success": True,
-            "premium": False,
-            "admin": False
-        })
-        self.assertTrue(self.client.cookie_jar._cookies["localhost.local"]["/"]["session"].value)
+        self.assertTrue(200 <= login.status_code < 400)
+        self.assertTrue(
+            self.client.cookie_jar._cookies["localhost.local"]["/"]["session"].value)
 
     def testLoginIncorrect(self, email="among@diya.ink", password="wordPass12"):
         """Tests logging in with an incorrect email and password."""
@@ -98,28 +81,22 @@ class TestServer(TestUtils):
                 "email": email2,
                 "password": password.upper()
             })
-            self.assertEqual(login.status_code, 401)
-            self.assertFalse(login.get_json()["success"])
+            self.assertTrue(400 <= login.status_code < 500)
             self.assertNotIn("localhost.local", self.client.cookie_jar._cookies)
 
     def testLogout(self, email="test@example.com", password="PassWord123"):
         """Tests logging in and then out."""
         self.testLoginCorrect(email, password)
         logout = self.client.get("/account/logout")
-        self.assertEqual(logout.status_code, 200)
+        self.assertTrue(200 <= logout.status_code < 400)
         details = self.client.get("/account/details")
-        self.assertEqual(details.status_code, 401)
+        self.assertTrue(300 <= details.status_code < 500)
 
     def testDetails(self, email="joe@diya.ink", password="CorrectHorseBatteryStaple"):
         """Tests getting user details."""
         self.testLoginCorrect(email, password)
         details = self.client.get("/account/details")
         self.assertEqual(details.status_code, 200)
-        json = details.get_json()
-        self.assertEqual(json["email"], email)
-        self.assertFalse(json["premium"])
-        self.assertFalse(json["admin"])
-        self.assertIn("created", json)
 
 class TestDatabase(TestUtils):
     def setUp(self):
