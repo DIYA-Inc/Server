@@ -10,20 +10,10 @@ h1, h2 {
     border-bottom: 1px solid #fff;
 }
 
-table, th, td {
-    border: 1px solid white;
-    border-collapse: collapse;
-    padding: 4px;
-}
-
 input, button {
     background-color: #2f3438;
     border: 2px inset #585858;
     color: #fff;
-}
-
-.comment {
-    color: #528d4c;
 }
 
 a:link {

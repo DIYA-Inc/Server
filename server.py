@@ -2,12 +2,10 @@
 
 import flask
 import logging
-import markdown
 import os
-from pygments.formatters import HtmlFormatter
 import sys
 
-from api import api
+import routes
 from database import database
 
 # Get variables from argv or use the defaults
@@ -22,43 +20,6 @@ for arg, var, default in [
     else:
         argv[var] = default
 
-mdCache = {}
-def getMarkdown(filename):
-    """Get the markdown from a file and return it as HTML."""
-    if filename in mdCache:
-        return mdCache[filename]
-
-    with open("static/" + filename, "r") as f:
-        file = f.read()
-
-    if not filename.endswith(".md"):
-        mdCache[filename] = file
-        return file
-
-    md = markdown.markdown(file, extensions=[
-        "fenced_code", "codehilite", "toc", "nl2br"])
-
-    formatter = HtmlFormatter(style="emacs", full=True, cssclass="codehilite")
-    css = formatter.get_style_defs() + getMarkdown("style.css")
-
-    mdCache[filename] = "<style>" + css + "</style>" + md
-    return mdCache[filename]
-
-
-static = flask.Blueprint("static", __name__)
-
-@static.route("/", methods=["GET"])
-def index():
-    """Return the index page"""
-    return getMarkdown("index.md")
-
-
-@static.app_errorhandler(404)
-def page_not_found(e):
-    """Return the api reference"""
-    return getMarkdown("apiReference.md"), 404
-
-
 def createServer(dataDir=argv["dataDir"], filename="database.db"):
     """Create a database and server object.
     
@@ -71,10 +32,10 @@ def createServer(dataDir=argv["dataDir"], filename="database.db"):
 
     db = database(dataDir, filename)
     db.executeScript("databaseStructure.sql")
-    api.db = db
+    routes.db = db
+    app.db = db
     
-    app.register_blueprint(api)
-    app.register_blueprint(static)
+    app.register_blueprint(routes.diya)
     return app
 
 

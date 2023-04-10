@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include("parts/meta.html") %}
+    <title>Register</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <h1>Register</h1>
+    <form method="post" action="/account/register">
+        <div>
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email">
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+        </div>
+        <div>
+            <input type="submit" value="Register">
+        </div>
+</body>
+
+</html>
