@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include("parts/meta.html") %}
+    <title>Error {{ error.code }}: {{ error.name }}</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <h1>Error {{ error.code }}: {{ error.name }}</h1>
+    <p>{{ error.description }}</p>
+
+    <p>
+        <a href="/">Go back to the homepage</a>
+    </p>
+</body>
+
+</html>

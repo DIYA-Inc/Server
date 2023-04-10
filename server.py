@@ -36,6 +36,7 @@ def createServer(dataDir=argv["dataDir"], filename="database.db"):
     app.db = db
     
     app.register_blueprint(routes.diya)
+    app.register_error_handler(404, routes.errorPage)
     return app
 
 

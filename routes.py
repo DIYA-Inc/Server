@@ -19,6 +19,12 @@ def welcome():
     return flask.render_template("welcome.html")
 
 
+@diya.errorhandler(404)
+def errorPage(error):
+    """Return the error page."""
+    return flask.render_template("error.html", error=error), error.code
+
+
 @diya.route("/account/login", methods=["POST"])
 def login():
     """Log in a user."""
@@ -26,12 +32,14 @@ def login():
     password = flask.request.form["password"]
 
     if email == None or password == None:
-        return "422\nTODO: Error Message", 422
+        return flask.render_template("account/login.html", 
+            error="Invalid email or password."), 422
     
     user = db.checkUser(email, password)
 
     if user[0] == False:
-        return "401\nTODO: Error Message", 401
+        return flask.render_template("account/login.html",
+            email=email, error="Invalid email or password."), 401
     
     flask.session["user"] = {
         "id": user[3],
@@ -46,7 +54,14 @@ def login():
 @diya.route("/account/login", methods=["GET"])
 def loginPage():
     """Return the login page."""
-    return flask.render_template("account/login.html")
+    if "email" in flask.session:
+        email = flask.session["email"]
+        del flask.session["email"]
+    else:
+        email = None
+    
+    return flask.render_template("account/login.html",
+        email=email, new=flask.request.args.get("new") != None)
 
 
 @diya.route("/account/register", methods=["POST"])
@@ -57,14 +72,17 @@ def register():
 
     if email == None or password == None or len(email) > 128 or (
         not re.match("[a-zA-Z0-9][^@]+[a-zA-Z0-9]@[a-zA-Z0-9\-\.]+\.[a-zA-Z0-9\-\.]+[a-zA-Z0-9]$", email)):
-        return "422\nTODO: Error Message", 422
+        return flask.render_template("account/register.html", error="Invalid email or password."), 422
     
     try:
         db.addUser(email, password)
     except IntegrityError:
-        return "409\nTODO: Error Message", 409
+        return flask.render_template("account/register.html",
+            email=email, error="Email already in use."), 409
     
-    return flask.redirect("/account/login")
+    flask.session["email"] = email
+    
+    return flask.redirect("/account/login?new=1")
 
 
 @diya.route("/account/register", methods=["GET"])
