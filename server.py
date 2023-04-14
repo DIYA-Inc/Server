@@ -5,8 +5,8 @@ import logging
 import os
 import sys
 
-import routes
-from database import database
+import scripts.routes as routes
+from scripts.database import database
 
 # Get variables from argv or use the defaults
 argv = {}
@@ -32,13 +32,9 @@ def createServer(dataDir=argv["dataDir"], filename="database.db"):
 
     db = database(dataDir, filename)
     db.executeScript("databaseStructure.sql")
-    routes.db = db
     app.db = db
-    
-    app.register_blueprint(routes.diya)
-    app.register_error_handler(404, routes.errorPage)
-    return app
 
+    return routes.setUpRoutes(app)
 
 # Use waitress as the WSGI server if it is installed,
 # but use built-in if it isnt, or if --werkzeug argument.
@@ -68,6 +64,7 @@ if __name__ == "__main__":
     # Run server
     if useWaitress:
         logging.getLogger("waitress.queue").setLevel(logging.CRITICAL)
-        waitress.serve(app, host=argv["host"], port=argv["port"], threads=8)
+        waitress.serve(app, host=argv["host"], port=argv["port"], threads=8, 
+            ident=f"DIYA-Inc/1.0 (Python/{sys.version.split()[0]}; Waitress)")
     else:
         app.run(host=argv["host"], port=argv["port"])
