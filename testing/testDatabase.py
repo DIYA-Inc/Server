@@ -85,6 +85,18 @@ class TestDatabase(TestUtils):
             for key in sampleBookMetadata[i]:
                 self.assertEqual(book[key], sampleBookMetadata[i][key])
 
+    def testUpdateBookMetadata(self):
+        """Tests updating a book in the database."""
+        self.testAddBookMetadata()
+        for i in range(len(sampleBookMetadata)-1):
+            newData = {**sampleBookMetadata[i+1]}
+            del newData["isbn"]
+            self.db.updateBookMetadata(i+1, **newData)
+            book = self.db.getBookMetadata(i+1)
+            newBook = dict(sampleBookMetadata[i], **newData)
+            for key in newBook:
+                self.assertEqual(book[key], newBook[key])
+
     def testDeleteBook(self):
         """Tests deleting a book from the database."""
         self.testAddBookMetadata()

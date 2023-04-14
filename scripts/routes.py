@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import flask
-
 import scripts.accountRoutes as accountRoutes
+import scripts.bookRoutes as bookRoutes
 import scripts.mainRoutes as mainRoutes
 
 def setUpRoutes(app):
-    for route in [accountRoutes, mainRoutes]:
+    for route in [accountRoutes, bookRoutes, mainRoutes]:
         app.register_blueprint(route.diya)
         route.db = app.db
     

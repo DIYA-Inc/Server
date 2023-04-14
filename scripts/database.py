@@ -122,6 +122,9 @@ class database:
             catalogues(list of str): The catalogues the book is in. (optional)
         Returns:
             int: The ID of the book."""
+        for field in [title, author, isbn]:
+            if not field:
+                raise ValueError("Required argument not provided.")
         con, cur = self.connect()
         cur.execute("""
             INSERT INTO books (
@@ -143,6 +146,40 @@ class database:
         con.commit()
         con.close()
         return bookID
+    
+    def updateBookMetadata(self, bookID, title=None, author=None, isbn=None,
+                           publisher=None, publicationDate=None, description=None,
+                           pageCount=None, language=None, genre=None,
+                           readingAge=None, catalogues=[]):
+        """Edit book metadata in the database."""
+        con, cur = self.connect()
+        cur.execute("""
+            UPDATE books SET
+                bookName = COALESCE(?, bookName),
+                author = COALESCE(?, author),
+                ISBN = COALESCE(?, ISBN),
+                publisher = COALESCE(?, publisher),
+                publicationDate = COALESCE(?, publicationDate),
+                description = COALESCE(?, description),
+                pageCount = COALESCE(?, pageCount),
+                language = COALESCE(?, language),
+                genre = COALESCE(?, genre),
+                readingAge = COALESCE(?, readingAge)
+            WHERE bookID = ?""",
+                    (title, author, isbn, publisher, publicationDate,
+                     description, pageCount, language, genre, readingAge, bookID))
+        cur.execute("DELETE FROM bookCatalogueLink WHERE bookID = ?", (bookID,))
+        for catalogue in catalogues:
+            cur.execute("""INSERT OR IGNORE INTO bookCatalogues (
+                catalogueName) VALUES (?)""", (catalogue,))
+            cur.execute("""
+                INSERT INTO bookCatalogueLink (
+                    bookID, catalogueID
+                ) VALUES ( ?,
+                    (SELECT catalogueID FROM bookCatalogues WHERE catalogueName = ?)
+                )""", (bookID, catalogue))
+        con.commit()
+        con.close()
     
     def getBookMetadata(self, bookID):
         """Get book metadata from the database.

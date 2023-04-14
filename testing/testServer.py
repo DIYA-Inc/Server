@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import sys
 import unittest
 
@@ -9,7 +10,7 @@ if "testing" == directory.split(os.sep)[-1]:
     sys.path.append(os.path.dirname(directory))
 
 from server import createServer
-from testing.utils import TestUtils
+from testing.utils import TestUtils, sampleBookMetadata
 
 
 class TestServer(TestUtils):
@@ -52,12 +53,26 @@ class TestServer(TestUtils):
         self.assertTrue(200 <= login.status_code < 400)
         self.assertTrue(
             self.client.cookie_jar._cookies["localhost.local"]["/"]["session"].value)
+        
+    def testLoginAdmin(self, email="admintest@diya.ink", password="Ligma222"):
+        """Tests logging in as an admin"""
+        self.testRegister(email, password)
+        con, cur = self.db.connect()
+        cur.execute(
+            "UPDATE users SET userAccessLevel=2 WHERE email=?", (email,))
+        con.commit()
+        con.close()
+        login = self.client.post("/account/login", data={
+            "email": email,
+            "password": password
+        })
+        self.assertTrue(200 <= login.status_code < 400)
 
     def testLoginIncorrect(self, email="among@diya.ink", password="wordPass12"):
         """Tests logging in with an incorrect email and password."""
         self.testRegister(email, password)
         for email2 in (email, "bruh@diya.ink"):
-            login = self.client.post("/account/login", json={
+            login = self.client.post("/account/login", data={
                 "email": email2,
                 "password": password.upper()
             })
@@ -76,6 +91,42 @@ class TestServer(TestUtils):
         self.testLoginCorrect(email, password)
         details = self.client.get("/account/details")
         self.assertEqual(details.status_code, 200)
+
+    def testAddBook(self):
+        """Tests adding and viewing a book."""
+        self.testLoginCorrect()
+        addBook = self.client.post("/admin/books/add",
+            data=sampleBookMetadata[1])
+        self.assertTrue(400 <= addBook.status_code < 500)
+        self.testLoginAdmin()
+        for book in sampleBookMetadata:
+            addBook = self.client.post("/admin/books/add", data=book)
+            self.assertTrue(200 <= addBook.status_code < 400)
+            viewBook = self.client.get(addBook.headers["Location"])
+            self.assertTrue(200 <= viewBook.status_code < 400)
+            page = viewBook.data.decode()
+            for field in book:
+                if (type(book[field]) == str and
+                        re.match(r'^[ a-zA-Z0-9]+$', book[field])):
+                    self.assertIn(book[field], page)
+
+    def testEditBook(self):
+        """Tests editing a book."""
+        self.testLoginAdmin()
+        addBook = self.client.post("/admin/books/add", data={
+            **sampleBookMetadata[1],
+            "catalogues": ", ".join(sampleBookMetadata[1]["catalogues"])})
+        self.assertTrue(200 <= addBook.status_code < 400)
+        editBook = self.client.post("/admin/books/edit/1", data={
+            **sampleBookMetadata[2],
+            "catalogues": ", ".join(sampleBookMetadata[2]["catalogues"])})
+        self.assertTrue(200 <= editBook.status_code < 400)
+        book = self.db.getBookMetadata(1)
+        bookShouldBe = {
+            **sampleBookMetadata[1],
+            **sampleBookMetadata[2],
+            "bookID": 1}
+        self.assertEqual(book, bookShouldBe)
 
 
 if __name__ == "__main__":

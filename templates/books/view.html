@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include("parts/meta.html") %}
+    <title>{{ book["title"] }}</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<!-- 
+    add book at /admin/books/add 
+    view book at /books/view/1
+    edit book at /admin/books/edit/1
+    delete books with HTTP DELETE to /admin/books/delete/1 (do it with javascript)
+-->
+
+<body>
+    {{ book["title"] }}<br>
+    {{ book["author"] }}<br>
+    {{ book["isbn"] }}<br>
+    {{ book["publisher"] }}<br>
+    {{ book["publicationDate"] }}<br>
+    {{ book["description"] }}<br>
+    {{ book["pageCount"] }}<br>
+    {{ book["language"] }}<br>
+    {{ book["genre"] }}<br>
+    {{ book["readingAge"] }}<br>
+    {{ book["catalogues"] }}<br>
+</body>
+
+</html>
