@@ -92,6 +92,20 @@ class TestServer(TestUtils):
         details = self.client.get("/account/details")
         self.assertEqual(details.status_code, 200)
 
+    def testDeleteAccount(self, email="delete@account.com", password="Password123"):
+        """Tests deleting an account."""
+        self.testLoginCorrect(email, password)
+        delete = self.client.delete("/account/delete")
+        self.assertTrue(200 <= delete.status_code < 400)
+        details = self.client.get("/account/details")
+        self.assertTrue(300 <= details.status_code < 500)
+        loginAgain = self.client.post("/account/login", data={
+            "email": email,
+            "password": password
+        })
+        self.assertTrue(400 <= loginAgain.status_code < 500)
+        self.testLoginCorrect(email, password)
+
     def testAddBook(self):
         """Tests adding and viewing a book."""
         self.testLoginCorrect()
@@ -127,6 +141,13 @@ class TestServer(TestUtils):
             **sampleBookMetadata[2],
             "bookID": 1}
         self.assertEqual(book, bookShouldBe)
+
+    def testDeleteBook(self):
+        """Tests deleting a book."""
+        self.testAddBook()
+        deleteBook = self.client.delete("/admin/books/delete/1")
+        self.assertEqual(deleteBook.status_code, 200)
+        self.assertRaises(ValueError, self.db.getBookMetadata, 1)
 
 
 if __name__ == "__main__":

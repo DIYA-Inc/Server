@@ -101,6 +101,16 @@ class database:
                 "premiumExpires": result[3]
             }
         raise ValueError("User does not exist.")
+    
+    def deleteUser(self, userID):
+        """Delete a user from the database.
+        
+        Args:
+            userID (int): The ID of the user."""
+        con, cur = self.connect()
+        cur.execute("DELETE FROM users WHERE userID = ?", (userID,))
+        con.commit()
+        con.close()
 
     def addBookMetadata(self, title, author, isbn,
             publisher=None, publicationDate=None, description=None,

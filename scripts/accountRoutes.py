@@ -93,6 +93,17 @@ def logout():
     return flask.redirect("/")
 
 
+@diya.route("/account/delete", methods=["DELETE"])
+def deleteAccount():
+    """Delete the logged in user."""
+    if "user" not in flask.session:
+        return flask.redirect("/account/login")
+
+    db.deleteUser(flask.session["user"]["id"])
+    flask.session.clear()
+    return flask.redirect("/")
+
+
 if "__main__" == __name__:
     import scripts.database as database
     db = database.database()
