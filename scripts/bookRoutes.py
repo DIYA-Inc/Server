@@ -60,6 +60,39 @@ def deleteBook(bookID):
     db.deleteBook(bookID)
     return "Book deleted"
 
+
+@diya.route("/api/books/search", methods=["GET"])
+def bookSearch():
+    """API for searching for books.
+    
+    URL Parameters:
+        query: The query to search for in the title, author, and description.
+        genre: The genre to limit the search to.
+        language: The language to limit the search to.
+        catalogue: The catalogue to limit the search to.
+        offset: The offset to start at, default 0.
+        limit: The maximum number of results to return, default 10, maximum 50."""
+    user = flask.session.get("user")
+    if user == None:
+        return flask.redirect(flask.url_for("diyaAccounts.loginPage", next=flask.request.url))
+    
+    query = flask.request.args.get("query", "")
+    genre = flask.request.args.get("genre", None)
+    language = flask.request.args.get("language", None)
+    catalogue = flask.request.args.get("catalogue", None)
+
+    try:
+        offset = int(flask.request.args.get("offset", 0))
+        limit = int(flask.request.args.get("limit", 10))
+    except ValueError: pass
+    if limit > 50:
+        limit = 50
+    
+    books = db.searchBooks(query, genre, language, catalogue, offset, limit)
+
+    return books
+
+
 def getBookFieldsFromForm():
     """Get the fields for a book from a POST"""
     values = {}
@@ -75,6 +108,7 @@ def getBookFieldsFromForm():
             if c.strip() != ""]
         
     return values
+
 
 if "__main__" == __name__:
     import scripts.database as database

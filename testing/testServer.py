@@ -114,6 +114,9 @@ class TestServer(TestUtils):
         self.assertTrue(400 <= addBook.status_code < 500)
         self.testLoginAdmin()
         for book in sampleBookMetadata:
+            if "catalogues" in book:
+                book = book.copy()
+                book["catalogues"] = ", ".join(book["catalogues"])
             addBook = self.client.post("/admin/books/add", data=book)
             self.assertTrue(200 <= addBook.status_code < 400)
             viewBook = self.client.get(addBook.headers["Location"])
@@ -136,6 +139,8 @@ class TestServer(TestUtils):
             "catalogues": ", ".join(sampleBookMetadata[2]["catalogues"])})
         self.assertTrue(200 <= editBook.status_code < 400)
         book = self.db.getBookMetadata(1)
+        del book["fileURL"]
+        del book["coverURL"]
         bookShouldBe = {
             **sampleBookMetadata[1],
             **sampleBookMetadata[2],
@@ -148,6 +153,31 @@ class TestServer(TestUtils):
         deleteBook = self.client.delete("/admin/books/delete/1")
         self.assertEqual(deleteBook.status_code, 200)
         self.assertRaises(ValueError, self.db.getBookMetadata, 1)
+
+    def testSearch(self):
+        """Tests searching for books."""
+        self.testAddBook()
+        for query, expectedBooks in (
+            ("", [1, 2, 3]),
+            ("query=learning", [2]),
+            ("query=learning&catalogue=computers", [2]),
+            ("query=learning&genre=programming", [2]),
+            ("query=learning&catalogue=mung", []),
+            ("catalogue=computers", [2, 3]),
+            ("query=ORWELL", [1]),
+            ("query=ORWELL&catalogue=computers", []),
+            ("language=en", [2]),
+            ("language=en&catalogue=computers", [2]),
+            ("catalogue=linux", [3]),
+            ("genre=programming", [2]),
+            ("limit=1", [1]),
+            ("limit=1&offset=1", [2]),
+            ("limit=1&offset=2", [3]),
+        ):
+            search = self.client.get("/api/books/search?" + query)
+            self.assertEqual(search.status_code, 200)
+            responseBookIDs = [book["bookID"] for book in search.json]
+            self.assertEqual(responseBookIDs, expectedBooks, query)
 
 
 if __name__ == "__main__":

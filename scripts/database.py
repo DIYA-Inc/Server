@@ -225,7 +225,9 @@ class database:
                 "language": result[7],
                 "genre": result[8],
                 "readingAge": result[9],
-                "catalogues": catalogues
+                "catalogues": catalogues,
+                "fileURL": "NOT IMPLEMENTED",
+                "coverURL": "NOT IMPLEMENTED"
             }
         raise ValueError("404: Book does not exist.")
     
@@ -240,6 +242,60 @@ class database:
         cur.execute("DELETE FROM bookCatalogues WHERE catalogueID NOT IN (SELECT catalogueID FROM bookCatalogueLink)")
         con.commit()
         con.close()
+
+    def searchBooks(self, query="", genre=None, language=None, catalogue=None, offset=0, limit=10):
+        """Search for books in the database.
+
+        Args:
+            query(str): The query to search for in the title, author, and description. (optional)
+            genre(str): The genre to limit the search to. (optional)
+            language(str): The language to limit the search to. (optional)
+            catalogue(str): The catalogue to limit the search to. (optional)
+            offset(int): The offset to start at, default 0. (optional)
+            limit(int): The maximum number of results to return, default 10. (optional)
+        Returns:
+            list of dict: The books that match the search."""
+        con, cur = self.connect()
+        sql = """
+            SELECT DISTINCT books.bookID, bookName, author, ISBN, publisher, publicationDate,
+                description, pageCount, language, genre, readingAge
+            FROM books  LEFT JOIN bookCatalogueLink ON books.bookID = bookCatalogueLink.bookID
+                        LEFT JOIN bookCatalogues ON bookCatalogueLink.catalogueID = bookCatalogues.catalogueID
+            WHERE   (bookName LIKE ? OR author LIKE ? OR description LIKE ?) """
+        values = ("%" + query + "%", "%" + query + "%", "%" + query + "%")
+
+        if genre is not None:
+            sql += " AND genre LIKE ? "
+            values += (genre,)
+        if language is not None:
+            sql += " AND language LIKE ? "
+            values += (language,)
+        if catalogue is not None:
+            sql += " AND bookCatalogues.catalogueName LIKE ? "
+            values += (catalogue,)
+
+        sql += " ORDER BY bookName LIMIT ? OFFSET ?"
+        values += (limit, offset)
+
+        cur.execute(sql, values)
+        
+        results = []
+        for result in cur.fetchall():
+            results.append({
+                "bookID": result[0],
+                "title": result[1],
+                "author": result[2],
+                "isbn": result[3],
+                "publisher": result[4],
+                "publicationDate": result[5],
+                "description": result[6],
+                "pageCount": result[7],
+                "language": result[8],
+                "genre": result[9],
+                "readingAge": result[10]
+            })
+        con.close()
+        return results
 
 
 if __name__ == "__main__":
