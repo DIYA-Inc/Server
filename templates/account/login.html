@@ -1,39 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     {% include("parts/meta.html") %}
     <title>Login</title>
-    <link href="/static/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <script src="/static/scripts/account/login.js" async></script>
 </head>
 
 <body>
-    <h1>Log In</h1>
+    <div class="text-center" style="width: 100%;height: 100%;margin-top: 55%;margin-bottom: 45%;"><img class="rounded-circle border border-1 border-dark" src="/static/img/DIYA.png" style="height: 96px;width: 96px;">
+        <p class="text-center"><strong>Welcome Back</strong><br>Login to continue</p>
 
-    {% if error %}
-    <!-- DO NOT LEAVE THIS WITH INLINE CSS, I WILL KILL! -->
-    <p style="color:red;">{{ error }}</p>
-    {% endif %}
 
-    {% if new %}
-    <!-- NO SERIOUSLY, I WILL ACTUALLY MURDER YOU! -->
-    <p style="color:green;">You have successfully registered an account! Please now log in.</p>
-    {% endif %}
+        {% if error %}
+        <p style="color:red;">{{ error }}</p>
+        {% endif %}
 
-    <form method="post" action="/account/login">
-        <div>
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" {% if email %} value="{{ email }}" {% endif %}>
+        {% if new %}
+        <p style="color:green;">You have successfully registered an account! Please now log in.</p>
+        {% endif %}
+
+        <form method="post" action="/account/login" class="container">
+            <div class="row">
+                <div class="col"><input type="email" required="" minlength="5" placeholder="Email address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" style="padding-left: 2px;margin-bottom: 5px;width: 50%;max-width: 200px;" name="email" id="email" {% if email %} value="{{ email }}" {% endif %}></div>
+            </div>
+            <div class="row">
+                <div class="col"><input type="password" name="password" id="password" placeholder="Password" style="padding-left: 2px;width: 50%;max-width: 200px;" maxlength="128" minlength="8"></div>
+            </div>
+            <div class="row" style="margin-top: 15px;">
+                <div class="col"><input class="btn btn-primary btn-sm text-center border rounded-pill" style="width: 50%;backdrop-filter: blur(0px);font-size: 12px;max-width: 200px;" type="submit" value="Sign In"></div>
+            </div>
+            <div class="col">
+                <br>
+                <p style="font-size: 12px;">New User? <a href="register">Register</a></p>
+            </div>
         </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password">
-        </div>
-        <div>
-            <input type="submit" value="Sign In">
-            <a href="/account/register">Register</a>
-        </div>
+
+        <!--
+            <div class="row">
+                <div class="col"><a style="font-size: 12px;" href="https://google.com">Forgot your password?</a></div>
+            </div>
+        -->
+    </div>
+    <script src="/static/js/bootstrap.min.js"></script>
 </body>
 
 </html>
