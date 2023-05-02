@@ -142,7 +142,7 @@ def addBookFile(bookID, files):
     if file.filename == "" or file.mimetype != "application/epub+zip":
         return
     
-    db.addFile(bookID, file)
+    db.addFile(bookID, file.read())
 
 
 if "__main__" == __name__:

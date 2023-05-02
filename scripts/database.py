@@ -252,8 +252,8 @@ class database:
         fileHash = cur.fetchone()[0]
         if fileHash:
             try:
-                os.remove(os.path.join(self.bookDir, fileHash + ".epub"))
-                os.remove(os.path.join(self.coverDir, fileHash + ".jpg"))
+                os.remove(os.path.join(self.directory, fileHash + ".epub"))
+                os.remove(os.path.join(self.directory, fileHash + ".jpg"))
             except FileNotFoundError:
                 pass
         
@@ -322,12 +322,11 @@ class database:
 
         Args:
             bookID(int): The ID of the book.
-            file(flask.FileStorage): The file to save."""
-        fileData = file.read()
-        hash = hashlib.md5(fileData).hexdigest()
+            file(bytes): The file to save."""
+        hash = hashlib.md5(file).hexdigest()
         epubPath = os.path.join(self.directory, hash + ".epub")
         with open(epubPath, "wb") as f:
-            f.write(fileData)
+            f.write(file)
 
         with zipfile.ZipFile(epubPath) as epubFile:
             cover = None
