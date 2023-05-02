@@ -14,7 +14,10 @@ def static(path):
 @diya.route("/", methods=["GET"])
 def welcome():
     """Return the welcome page."""
-    return flask.render_template("welcome.html")
+    if "user" in flask.session:
+        return flask.render_template("index.html", user=flask.session["user"], books=db.searchBooks(limit=1000))
+    else:
+        return flask.render_template("welcome.html")
 
 
 @diya.errorhandler(404)
