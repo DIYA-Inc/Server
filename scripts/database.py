@@ -231,7 +231,7 @@ class database:
                 "readingAge": result[9],
                 "catalogues": catalogues,
                 "fileURL": None,
-                "coverURL": None
+                "coverURL": "/static/img/cover.jpg"
             }
 
             if result[10]:

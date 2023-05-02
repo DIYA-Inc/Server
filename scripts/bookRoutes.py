@@ -9,6 +9,9 @@ diya = flask.Blueprint("diyaBooks", __name__, template_folder="templates")
 @diya.route("/books/view/<int:bookID>", methods=["GET"])
 def viewBook(bookID):
     """View a book."""
+    if flask.session.get("user") == None:
+        return flask.abort(401, "You must be signed in to access a book.")
+    
     try:
         book = db.getBookMetadata(bookID)
     except ValueError:
@@ -27,8 +30,11 @@ def viewBookFile(bookHash):
 
 @diya.route("/books/cover/<string:bookHash>.jpg", methods=["GET"])
 def viewBookImage(bookHash):
-    """Serve a book cover."""
-    return flask.send_file(os.path.join(db.directory, bookHash + ".jpg"))
+    """Serve a book cover if it exists or send the placeholder image."""
+    try:
+        return flask.send_file(os.path.join(db.directory, bookHash + ".jpg"))
+    except FileNotFoundError:
+        return flask.send_file("static/img/cover.jpg")
 
 
 @diya.route("/admin/books/add", methods=["GET", "POST"])
