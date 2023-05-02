@@ -20,6 +20,22 @@ def viewBook(bookID):
     return flask.render_template("books/view.html", book=book)
 
 
+@diya.route("/books/read/<int:bookID>", methods=["GET"])
+def readBook(bookID):
+    """View a book."""
+    if flask.session.get("user") == None:
+        return flask.abort(401, "You must be signed in to read a book.")
+
+    try:
+        book = db.getBookMetadata(bookID)
+        if not book["fileURL"]:
+            raise flask.abort(404, "This book is not readable.")
+    except ValueError:
+        raise flask.abort(404, "The book you were looking for was not found.")
+
+    return flask.render_template("books/read.html", book=book)
+
+
 @diya.route("/books/file/<string:bookHash>.epub", methods=["GET"])
 def viewBookFile(bookHash):
     """Serve a book file."""

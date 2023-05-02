@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% include("parts/meta.html") %}
+    <title>{{ book.title }}</title>
+    <script src="/static/scripts/jszip.min.js"></script>
+    <script src="/static/scripts/epub.min.js"></script>
+    <style>
+        .epub-container {
+            min-width: 320px;
+            margin: 0 auto;
+            position: relative;
+        }
+    
+        .epub-container .epub-view>iframe {
+            background: white;
+            box-shadow: 0 0 4px #ccc;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        var book = ePub("{{ book.fileURL }}");
+        var rendition = book.renderTo(document.body, {
+            manager: "continuous",
+            flow: "scrolled",
+            width: "100%",
+            height: "100%"
+        });
+
+        var displayed = rendition.display("1");
+    </script>
+</body>
+</html>
