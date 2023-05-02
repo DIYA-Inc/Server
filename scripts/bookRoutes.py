@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import flask
+import os
 
 diya = flask.Blueprint("diyaBooks", __name__, template_folder="templates")
 
@@ -16,6 +17,20 @@ def viewBook(bookID):
     return flask.render_template("books/view.html", book=book)
 
 
+@diya.route("/books/file/<string:bookHash>.epub", methods=["GET"])
+def viewBookFile(bookHash):
+    """Serve a book file."""
+    if flask.session.get("user") == None:
+        return flask.abort(401, "You must be signed in to access a book.")
+    return flask.send_file(os.path.join(db.directory, bookHash + ".epub"))
+
+
+@diya.route("/books/cover/<string:bookHash>.jpg", methods=["GET"])
+def viewBookImage(bookHash):
+    """Serve a book cover."""
+    return flask.send_file(os.path.join(db.directory, bookHash + ".jpg"))
+
+
 @diya.route("/admin/books/add", methods=["GET", "POST"])
 def addBook():
     """Add a books metadata."""
@@ -29,6 +44,7 @@ def addBook():
         return flask.render_template("admin/books/add.html")
     
     bookID = db.addBookMetadata(**getBookFieldsFromForm())
+    addBookFile(bookID, flask.request.files)
     return flask.redirect(flask.url_for("diyaBooks.viewBook", bookID=bookID))
 
 
@@ -45,6 +61,7 @@ def editBook(bookID):
         return flask.render_template("admin/books/edit.html", book=db.getBookMetadata(bookID), bookID=bookID)
 
     db.updateBookMetadata(bookID, **getBookFieldsFromForm())
+    addBookFile(bookID, flask.request.files)
     return flask.redirect(flask.url_for("diyaBooks.viewBook", bookID=bookID))
 
 
@@ -108,6 +125,18 @@ def getBookFieldsFromForm():
             if c.strip() != ""]
         
     return values
+
+
+def addBookFile(bookID, files):
+    """Add a book file to a book if there is a file in the request."""
+    if "file" not in files:
+        return
+
+    file = files["file"]
+    if file.filename == "" or file.mimetype != "application/epub+zip":
+        return
+    
+    db.addFile(bookID, file)
 
 
 if "__main__" == __name__:

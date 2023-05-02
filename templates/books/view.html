@@ -25,7 +25,13 @@
     {{ book["language"] }}<br>
     {{ book["genre"] }}<br>
     {{ book["readingAge"] }}<br>
-    {{ book["catalogues"] }}<br>
+    {{ book["catalogues"] }}<br><br>
+
+    <img src="{{ book['coverURL'] }}" alt="Cover Image">
+    
+    {% if book["fileURL"] %}
+    <br><br><a href="/books/read/{{ book['bookID'] }}">Read Book</a>
+    {% endif %}
 </body>
 
 </html>

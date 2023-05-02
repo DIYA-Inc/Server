@@ -9,7 +9,7 @@
 
 <body>
     <!-- There should be max lengths, check scripts/databaseStructure.sql -->
-    <form method="post" action="/admin/books/edit/{{ bookID }}">
+    <form method="post" action="/admin/books/edit/{{ bookID }}" enctype="multipart/form-data">
         <label for="title">Title</label>
         <input type="text" name="title" id="title">
 
@@ -49,6 +49,9 @@
         <label for="catalogues">Catalogues</label>
         <input type="text" name="catalogues" id="catalogues">
 
+        <label for="file">File</label>
+        <input type="file" name="file" id="file" accept=".epub">
+
         <input type="submit" value="Edit book">
     </form>
 
@@ -67,4 +70,10 @@
     {{ book["genre"] }}<br>
     {{ book["readingAge"] }}<br>
     {{ book["catalogues"] }}<br>
+
+    <img src="{{ book['coverURL'] }}" alt="Cover Image">
+    
+    {% if book["fileURL"] %}
+    <br><br><a href="/books/read/{{ book['bookID'] }}">Read Book</a>
+    {% endif %}
 </body>
