@@ -118,9 +118,9 @@ class TestServer(TestUtils):
                 book = book.copy()
                 book["catalogues"] = ", ".join(book["catalogues"])
             addBook = self.client.post("/admin/books/add", data=book)
-            self.assertTrue(200 <= addBook.status_code < 400)
+            self.assertTrue(300 <= addBook.status_code < 400)
             viewBook = self.client.get(addBook.headers["Location"])
-            self.assertTrue(200 <= viewBook.status_code < 400)
+            self.assertTrue(200 <= viewBook.status_code < 300)
             page = viewBook.data.decode()
             for field in book:
                 if (type(book[field]) == str and
@@ -178,6 +178,52 @@ class TestServer(TestUtils):
             self.assertEqual(search.status_code, 200)
             responseBookIDs = [book["bookID"] for book in search.json]
             self.assertEqual(responseBookIDs, expectedBooks, query)
+
+    def testAddFileNew(self):
+        """Tests uploading a file to a new book."""
+        self.testLoginAdmin()
+        
+        addBook = self.client.post("/admin/books/add", data={
+            **sampleBookMetadata[1],
+            "catalogues": ", ".join(sampleBookMetadata[1]["catalogues"]),
+            "file": open(os.path.join(os.path.dirname(__file__), "data/book.epub"), "rb")},
+            content_type="multipart/form-data")
+        
+        return self.verifyFileAdded(addBook)
+
+    def testAddFileEdit(self):
+        """Tests uploading a file to an existing book."""
+        self.testAddBook()
+        editBook = self.client.post("/admin/books/edit/1", data={
+            "file": open(os.path.join(os.path.dirname(__file__), "data/book.epub"), "rb")},
+            content_type="multipart/form-data")
+
+        self.verifyFileAdded(editBook)
+
+    def verifyFileAdded(self, response):
+        """Check that an epub file was added correctly."""
+        self.assertTrue(300 <= response.status_code < 400)
+        getBook = self.client.get(response.headers["Location"])
+        self.assertTrue(200 <= getBook.status_code < 300)
+        imageUrl = re.search(r'src="/books/cover/.*?\.jpg"', getBook.data.decode()).group(0)[5:-1]
+
+        getImage = self.client.get(imageUrl)
+        self.assertTrue(200 <= getImage.status_code < 300)
+
+        getEpub = self.client.get(imageUrl.replace(
+            "cover", "file").replace(".jpg", ".epub"))
+        self.assertTrue(200 <= getEpub.status_code < 300)
+
+        return imageUrl
+
+    def testFileDelete(self):
+        """Tests adding a book with a file, then deleting to verify the file is gone."""
+        imageUrl = self.testAddFileNew()
+        imageBeforeDelete = self.client.get(imageUrl)
+        deleteBook = self.client.delete("/admin/books/delete/1")
+        self.assertTrue(200 <= deleteBook.status_code < 400)
+        imageAfterDelete = self.client.get(imageUrl)
+        self.assertNotEqual(imageBeforeDelete.data, imageAfterDelete.data)
 
 
 if __name__ == "__main__":

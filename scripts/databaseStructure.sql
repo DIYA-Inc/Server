@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS books (
     genre               VARCHAR(32),
     readingAge          INTEGER,
     description         TEXT,
+    fileHash            VARCHAR(32),
     PRIMARY KEY (bookID AUTOINCREMENT),
     UNIQUE (ISBN)
 );

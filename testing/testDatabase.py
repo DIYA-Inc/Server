@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import hashlib
 import os
 import sys
 import unittest
@@ -121,6 +122,23 @@ class TestDatabase(TestUtils):
         self.db.deleteBook(3)
         cur.execute("SELECT * FROM bookCatalogues")
         self.assertEqual(cur.fetchall(), [])
+
+    def testAddFile(self):
+        """Tests adding a file to the database"""
+        self.testAddBookMetadata()
+        with open(os.path.join(os.path.dirname(__file__), "data/book.epub"), "rb") as file:
+            fileData = file.read()
+        hash = hashlib.md5(fileData).hexdigest()
+        self.db.addFile(1, fileData)
+        book = self.db.getBookMetadata(1)
+        self.assertEqual(book["fileURL"], "/books/file/" + hash + ".epub")
+        self.assertEqual(book["coverURL"], "/books/cover/" + hash + ".jpg")
+        self.assertTrue(os.path.exists(os.path.join(self.tempDataDir, hash + ".epub")))
+        self.assertTrue(os.path.exists(os.path.join(self.tempDataDir, hash + ".jpg")))
+        self.assertEqual(fileData, open(os.path.join(self.tempDataDir, hash + ".epub"), "rb").read())
+        self.db.deleteBook(1)
+        self.assertFalse(os.path.exists(os.path.join(self.tempDataDir, hash + ".epub")))
+        self.assertFalse(os.path.exists(os.path.join(self.tempDataDir, hash + ".jpg")))
 
 
 if __name__ == "__main__":

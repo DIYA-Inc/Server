@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
 import bcrypt
+import hashlib
 import os
+import PIL.Image
+import re
 import sqlite3
+import zipfile
 
 
 class database:
@@ -201,7 +205,7 @@ class database:
         con, cur = self.connect()
         cur.execute("""
             SELECT bookName, author, ISBN, publisher, publicationDate,
-                description, pageCount, language, genre, readingAge
+                description, pageCount, language, genre, readingAge, fileHash
             FROM books WHERE bookID = ?""", (bookID,))
         result = cur.fetchone()
         if result:
@@ -213,7 +217,7 @@ class database:
             catalogues = [catalogue[0] for catalogue in cur.fetchall()]
         con.close()
         if result:
-            return {
+            book = {
                 "bookID": bookID,
                 "title": result[0],
                 "author": result[1],
@@ -226,9 +230,15 @@ class database:
                 "genre": result[8],
                 "readingAge": result[9],
                 "catalogues": catalogues,
-                "fileURL": "NOT IMPLEMENTED",
-                "coverURL": "NOT IMPLEMENTED"
+                "fileURL": None,
+                "coverURL": "/static/img/cover.jpg"
             }
+
+            if result[10]:
+                book["fileURL"] = "/books/file/" + result[10] + ".epub"
+                book["coverURL"] = "/books/cover/" + result[10] + ".jpg"
+
+            return book
         raise ValueError("404: Book does not exist.")
     
     def deleteBook(self, bookID):
@@ -237,6 +247,16 @@ class database:
         Args:
             bookID(int): The ID of the book."""
         con, cur = self.connect()
+
+        cur.execute("SELECT fileHash FROM books WHERE bookID = ?", (bookID,))
+        fileHash = cur.fetchone()[0]
+        if fileHash:
+            try:
+                os.remove(os.path.join(self.directory, fileHash + ".epub"))
+                os.remove(os.path.join(self.directory, fileHash + ".jpg"))
+            except FileNotFoundError:
+                pass
+        
         cur.execute("DELETE FROM books WHERE bookID = ?", (bookID,))
         cur.execute("DELETE FROM bookCatalogueLink WHERE bookID = ?", (bookID,))
         cur.execute("DELETE FROM bookCatalogues WHERE catalogueID NOT IN (SELECT catalogueID FROM bookCatalogueLink)")
@@ -296,6 +316,39 @@ class database:
             })
         con.close()
         return results
+    
+    def addFile(self, bookID, file):
+        """Save the file and update the database.
+
+        Args:
+            bookID(int): The ID of the book.
+            file(bytes): The file to save."""
+        hash = hashlib.md5(file).hexdigest()
+        epubPath = os.path.join(self.directory, hash + ".epub")
+        with open(epubPath, "wb") as f:
+            f.write(file)
+
+        with zipfile.ZipFile(epubPath) as epubFile:
+            cover = None
+            for item in epubFile.infolist():
+                if re.match(r".*cover\.(png|jpg|jpeg)$", item.filename, re.IGNORECASE):
+                    cover = item
+                    break
+            if not cover:
+                for item in epubFile.infolist():
+                    if re.match(r".*\.(png|jpg|jpeg)$", item.filename, re.IGNORECASE):
+                        cover = item
+                        break
+            
+            if cover:
+                PIL.Image.open(epubFile.open(cover)
+                    ).convert('RGB').resize((400, 600), PIL.Image.ANTIALIAS
+                    ).save(os.path.join(self.directory, hash + ".jpg"), "JPEG")
+                
+        con, cur = self.connect()
+        cur.execute("UPDATE books SET fileHash = ? WHERE bookID = ?", (hash, bookID))
+        con.commit()
+        con.close()
 
 
 if __name__ == "__main__":

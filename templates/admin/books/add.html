@@ -9,7 +9,7 @@
 
 <body>
     <!-- There should be max lengths, check scripts/databaseStructure.sql -->
-    <form method="post" action="/admin/books/add">
+    <form method="post" action="/admin/books/add" enctype="multipart/form-data">
         <label for="title">Title (required)</label>
         <input type="text" name="title" id="title"required>
 
@@ -48,6 +48,9 @@
         "catalogue1, catalogue2, catalogue3"-->
         <label for="catalogues">Catalogues</label>
         <input type="text" name="catalogues" id="catalogues">
+
+        <label for="file">File</label>
+        <input type="file" name="file" id="file" accept=".epub">
 
         <input type="submit" value="Add book">
     </form>
