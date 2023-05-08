@@ -3,38 +3,39 @@
 
 <head>
     {% include("parts/meta.html") %}
+
+    {% include("parts/nav.html")%}
+
     <title>Site Map</title>
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
 <body>
-    <h1>Temporary Site Map</h1>
+    <h2>Welcome {{ user["email"] }}!</h2>
 
-    <h2>Account Stuff</h2>
-    <ul>
-        <li><a href="/account/logout">Logout</a></li>
-        <li><a href="/account/details">Account Details</a></li>
-    </ul>
-    <p>(if you are seeing this instead of the welcome page, you are already logged in)</p>
-    <ul>
-        <li><a href="/account/login">Login</a></li>
-        <li><a href="/account/register">Register</a></li>
-    </ul>
-
-    <h2>Books</h2>
-    <ul>
+    <div id="bookList">
+    <h3>Books</h3>
+    
         {% for book in books %}
-        <li><a href="/books/view/{{ book.bookID }}">{{ book.title }}</a></li>
+        <a id= "bookList" href="/books/view/{{ book.bookID }}">{{ book.title }}</a>
         {% endfor %}
-    </ul>
+    
 
-    <h2>Admin Books</h2>
-    <ul>
-        <li><a href="/admin/books/add">Add Book</a></li>
+    </div>
+    
+    <div id="admin">
+        {% if user.admin%}
+    <h3>Admin Books</h3>
+
+        <a id= "addBooks" href="/admin/books/add">Add Book</a>
         {% for book in books %}
-        <li><a href="/admin/books/edit/{{ book.bookID }}">Edit {{ book.title }}</a></li>
+        <a id= "editBooks" href="/admin/books/edit/{{ book.bookID }}">Edit {{ book.title }}</a>
         {% endfor %}
-    </ul>
+
+        {% endif %}
+    </div>
+    
+    
 </body>
 
 </html>
