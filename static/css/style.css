@@ -20,6 +20,8 @@ input, button {
 }
 
 a:link {
+
+    padding: 5px;
     text-decoration: none;
     color: #544efd;
 }
@@ -28,7 +30,13 @@ a:visited {
     color: #9800be;
 }
 
+nav {
+    text-align: center;
+}
+
 title{
  
     text-align: center;
 }
+
+
