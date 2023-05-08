@@ -101,7 +101,7 @@ def deleteAccount():
 
     db.deleteUser(flask.session["user"]["id"])
     flask.session.clear()
-    return flask.redirect("/")
+    return "OK", 200
 
 
 if "__main__" == __name__:
