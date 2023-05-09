@@ -23,6 +23,16 @@
     <script src="/static/scripts/account/delete.js"></script>
     <button onclick="deleteAccountButton()">Delete Account</button>
 
+    <br>
+
+    <script src="/static/scripts/account/adminDebug.js"></script>
+    <p>Admin Debug</p>
+    {% if user.admin %}
+    <button onclick="toggleAdminButton(true)">Remove Admin</button>
+    {% else %}
+    <button onclick="toggleAdminButton(false)">Become Admin</button>
+    {% endif %}
+
 </body>
 
 </html>
