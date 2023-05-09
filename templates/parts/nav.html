@@ -1,11 +1,10 @@
 <style>
     .filterSearchSettings {
         margin-top: 10px;
-        font-size: 18px;
     }
   
     .filterSearchSettings details {
-        width: 99%;
+        width: 50%;
         margin: 0 auto ;
         background: #ffffff;
         margin-bottom: .5rem;
@@ -15,10 +14,9 @@
     }
     
     .filterSearchSettings summary {
-        padding: 1rem;
+        padding: 0.65rem;
         display: block;
         background: #9e9e9e;
-        padding-left: 2rem;
         position: relative;
         cursor: pointer;
     }
@@ -56,16 +54,12 @@
         <div class="filterSearchSettings">
             <details>
                 <summary>
-                    Filters
+                    Filter Search
                 </summary>
                 <label for="genre">Genre</label>
-                    <input type="text" name="genre" id="genre">
-    
-                    <label for="language">Language</label>
-                    <input type="text" name="language" id="language">
-                    
-                    <label for="catalogue">Catalouge</label>
-                    <input type="text" name="catalouge" id="catalouge">
+                    <input type="text" name="genre" id="genre" placeholder="Genre">
+                    <input type="text" name="language" id="language" placeholder="Language">
+                    <input type="text" name="catalouge" id="catalouge" placeholder="Catalouge">
             </details>
         </div>
         <button type="submit">Go</button>
