@@ -64,8 +64,10 @@ if __name__ == "__main__":
 
     # Run server
     if useWaitress:
+        print(f"Starting server at http://{argv['host']}:{argv['port']}/")
         logging.getLogger("waitress.queue").setLevel(logging.CRITICAL)
         waitress.serve(app, host=argv["host"], port=argv["port"], threads=8, 
             ident=f"DIYA-Inc/1.0 (Python/{sys.version.split()[0]}; Waitress)")
+        print()
     else:
         app.run(host=argv["host"], port=argv["port"])

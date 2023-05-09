@@ -25,6 +25,7 @@ class TestDatabase(TestUtils):
         tables = cur.fetchall()
         for table in ("users", "verificationTokens", "books", "bookCatalogues", "bookCatalogueLink"):
             self.assertIn((table,), tables)
+        con.close()
 
     def testRegister(self, email="joe@joeblakeb.com", password="Password123"):
         """Check that the add user function works correctly."""
@@ -35,6 +36,7 @@ class TestDatabase(TestUtils):
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0][1], email)
         self.assertNotEqual(users[0][2], password)
+        con.close()
 
     def testLogin(self):
         """Check that the login function works correctly."""
@@ -55,6 +57,7 @@ class TestDatabase(TestUtils):
         cur.execute(
             "UPDATE users SET userAccessLevel = 2 WHERE email = ?", (email,))
         con.commit()
+        con.close()
         self.assertEqual(
             self.db.checkUser(email, password),
             (True, True, True, 1), "Admin account")
@@ -122,6 +125,7 @@ class TestDatabase(TestUtils):
         self.db.deleteBook(3)
         cur.execute("SELECT * FROM bookCatalogues")
         self.assertEqual(cur.fetchall(), [])
+        con.close()
 
     def testAddFile(self):
         """Tests adding a file to the database"""

@@ -51,10 +51,14 @@ class database:
         email = email.lower()
         hashedPassword = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
         con, cur = self.connect()
-        cur.execute(
-            "INSERT INTO users (email, passwordHash) VALUES (?, ?)",
-            (email, hashedPassword))
-        con.commit()
+        try:
+            cur.execute(
+                "INSERT INTO users (email, passwordHash) VALUES (?, ?)",
+                (email, hashedPassword))
+            con.commit()
+        except sqlite3.OperationalError:
+            con.close()
+            raise sqlite3.IntegrityError("Invalid argument.")
         con.close()
 
     def checkUser(self, email, password):
@@ -71,11 +75,14 @@ class database:
             (int): The user's ID"""
         email = email.lower()
         con, cur = self.connect()
-        cur.execute("""
-            SELECT userID, passwordHash, userAccessLevel
-            FROM users WHERE email = ?""",
-            (email,))
-        result = cur.fetchone()
+        try:
+            cur.execute("""
+                SELECT userID, passwordHash, userAccessLevel
+                FROM users WHERE email = ?""",
+                (email,))
+            result = cur.fetchone()
+        except sqlite3.OperationalError:
+            result = None
         con.close()
         if result and bcrypt.checkpw(password.encode("utf-8"), result[1]):
                 return (True, result[2] >= 1, result[2] >= 2, result[0])
@@ -90,11 +97,14 @@ class database:
         Returns:
             dict: The user's details."""
         con, cur = self.connect()
-        cur.execute("""
-            SELECT email, userAccessLevel, created, premiumExpires
-            FROM users WHERE userID = ?""",
-            (userID,))
-        result = cur.fetchone()
+        try:
+            cur.execute("""
+                SELECT email, userAccessLevel, created, premiumExpires
+                FROM users WHERE userID = ?""",
+                (userID,))
+            result = cur.fetchone()
+        except sqlite3.OperationalError:
+            result = None
         con.close()
         if result:
             return {
@@ -112,8 +122,11 @@ class database:
         Args:
             userID (int): The ID of the user."""
         con, cur = self.connect()
-        cur.execute("DELETE FROM users WHERE userID = ?", (userID,))
-        con.commit()
+        try:
+            cur.execute("DELETE FROM users WHERE userID = ?", (userID,))
+            con.commit()
+        except sqlite3.OperationalError:
+            con.rollback()
         con.close()
 
     def addBookMetadata(self, title, author, isbn,
@@ -140,24 +153,29 @@ class database:
             if not field:
                 raise ValueError("Required argument not provided.")
         con, cur = self.connect()
-        cur.execute("""
-            INSERT INTO books (
-                bookName, author, ISBN, publisher, publicationDate,
-                description, pageCount, language, genre, readingAge
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (title, author, isbn, publisher, publicationDate,
-                description, pageCount, language, genre, readingAge))
-        bookID = cur.lastrowid
-        for catalogue in catalogues:
-            cur.execute("""INSERT OR IGNORE INTO bookCatalogues (
-                catalogueName) VALUES (?)""", (catalogue,))
+        try:
             cur.execute("""
-                INSERT INTO bookCatalogueLink (
-                    bookID, catalogueID
-                ) VALUES ( ?,
-                    (SELECT catalogueID FROM bookCatalogues WHERE catalogueName = ?)
-                )""", (bookID, catalogue))
-        con.commit()
+                INSERT INTO books (
+                    bookName, author, ISBN, publisher, publicationDate,
+                    description, pageCount, language, genre, readingAge
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (title, author, isbn, publisher, publicationDate,
+                    description, pageCount, language, genre, readingAge))
+            bookID = cur.lastrowid
+            for catalogue in catalogues:
+                cur.execute("""INSERT OR IGNORE INTO bookCatalogues (
+                    catalogueName) VALUES (?)""", (catalogue,))
+                cur.execute("""
+                    INSERT INTO bookCatalogueLink (
+                        bookID, catalogueID
+                    ) VALUES ( ?,
+                        (SELECT catalogueID FROM bookCatalogues WHERE catalogueName = ?)
+                    )""", (bookID, catalogue))
+            con.commit()
+        except sqlite3.OperationalError:
+            con.rollback()
+            con.close()
+            raise ValueError("Invalid argument.")
         con.close()
         return bookID
     
@@ -167,32 +185,35 @@ class database:
                            readingAge=None, catalogues=[]):
         """Edit book metadata in the database."""
         con, cur = self.connect()
-        cur.execute("""
-            UPDATE books SET
-                bookName = COALESCE(?, bookName),
-                author = COALESCE(?, author),
-                ISBN = COALESCE(?, ISBN),
-                publisher = COALESCE(?, publisher),
-                publicationDate = COALESCE(?, publicationDate),
-                description = COALESCE(?, description),
-                pageCount = COALESCE(?, pageCount),
-                language = COALESCE(?, language),
-                genre = COALESCE(?, genre),
-                readingAge = COALESCE(?, readingAge)
-            WHERE bookID = ?""",
-                    (title, author, isbn, publisher, publicationDate,
-                     description, pageCount, language, genre, readingAge, bookID))
-        cur.execute("DELETE FROM bookCatalogueLink WHERE bookID = ?", (bookID,))
-        for catalogue in catalogues:
-            cur.execute("""INSERT OR IGNORE INTO bookCatalogues (
-                catalogueName) VALUES (?)""", (catalogue,))
+        try:
             cur.execute("""
-                INSERT INTO bookCatalogueLink (
-                    bookID, catalogueID
-                ) VALUES ( ?,
-                    (SELECT catalogueID FROM bookCatalogues WHERE catalogueName = ?)
-                )""", (bookID, catalogue))
-        con.commit()
+                UPDATE books SET
+                    bookName = COALESCE(?, bookName),
+                    author = COALESCE(?, author),
+                    ISBN = COALESCE(?, ISBN),
+                    publisher = COALESCE(?, publisher),
+                    publicationDate = COALESCE(?, publicationDate),
+                    description = COALESCE(?, description),
+                    pageCount = COALESCE(?, pageCount),
+                    language = COALESCE(?, language),
+                    genre = COALESCE(?, genre),
+                    readingAge = COALESCE(?, readingAge)
+                WHERE bookID = ?""",
+                        (title, author, isbn, publisher, publicationDate,
+                        description, pageCount, language, genre, readingAge, bookID))
+            cur.execute("DELETE FROM bookCatalogueLink WHERE bookID = ?", (bookID,))
+            for catalogue in catalogues:
+                cur.execute("""INSERT OR IGNORE INTO bookCatalogues (
+                    catalogueName) VALUES (?)""", (catalogue,))
+                cur.execute("""
+                    INSERT INTO bookCatalogueLink (
+                        bookID, catalogueID
+                    ) VALUES ( ?,
+                        (SELECT catalogueID FROM bookCatalogues WHERE catalogueName = ?)
+                    )""", (bookID, catalogue))
+            con.commit()
+        except sqlite3.OperationalError:
+            con.rollback()
         con.close()
     
     def getBookMetadata(self, bookID):
@@ -203,18 +224,21 @@ class database:
         Returns:
             dict: The book's metadata."""
         con, cur = self.connect()
-        cur.execute("""
-            SELECT bookName, author, ISBN, publisher, publicationDate,
-                description, pageCount, language, genre, readingAge, fileHash
-            FROM books WHERE bookID = ?""", (bookID,))
-        result = cur.fetchone()
-        if result:
+        try:
             cur.execute("""
-                SELECT catalogueName
-                FROM bookCatalogues
-                INNER JOIN bookCatalogueLink ON bookCatalogues.catalogueID = bookCatalogueLink.catalogueID
-                WHERE bookID = ?""", (bookID,))
-            catalogues = [catalogue[0] for catalogue in cur.fetchall()]
+                SELECT bookName, author, ISBN, publisher, publicationDate,
+                    description, pageCount, language, genre, readingAge, fileHash
+                FROM books WHERE bookID = ?""", (bookID,))
+            result = cur.fetchone()
+            if result:
+                cur.execute("""
+                    SELECT catalogueName
+                    FROM bookCatalogues
+                    INNER JOIN bookCatalogueLink ON bookCatalogues.catalogueID = bookCatalogueLink.catalogueID
+                    WHERE bookID = ?""", (bookID,))
+                catalogues = [catalogue[0] for catalogue in cur.fetchall()]
+        except sqlite3.OperationalError:
+            result = None
         con.close()
         if result:
             book = {
@@ -247,21 +271,23 @@ class database:
         Args:
             bookID(int): The ID of the book."""
         con, cur = self.connect()
-
-        cur.execute("SELECT fileHash FROM books WHERE bookID = ?", (bookID,))
-        fileHash = cur.fetchone()[0]
-        if fileHash:
-            try:
-                os.remove(os.path.join(self.directory, fileHash + ".epub"))
-                os.remove(os.path.join(self.directory, fileHash + ".jpg"))
-            except FileNotFoundError:
-                pass
-        
-        cur.execute("DELETE FROM books WHERE bookID = ?", (bookID,))
-        cur.execute("DELETE FROM bookCatalogueLink WHERE bookID = ?", (bookID,))
-        cur.execute("DELETE FROM bookCatalogues WHERE catalogueID NOT IN (SELECT catalogueID FROM bookCatalogueLink)")
-        con.commit()
-        con.close()
+        try:
+            cur.execute("SELECT fileHash FROM books WHERE bookID = ?", (bookID,))
+            fileHash = cur.fetchone()[0]
+            if fileHash:
+                try:
+                    os.remove(os.path.join(self.directory, fileHash + ".epub"))
+                    os.remove(os.path.join(self.directory, fileHash + ".jpg"))
+                except FileNotFoundError:
+                    pass
+            
+            cur.execute("DELETE FROM books WHERE bookID = ?", (bookID,))
+            cur.execute("DELETE FROM bookCatalogueLink WHERE bookID = ?", (bookID,))
+            cur.execute("DELETE FROM bookCatalogues WHERE catalogueID NOT IN (SELECT catalogueID FROM bookCatalogueLink)")
+            con.commit()
+            con.close()
+        except sqlite3.OperationalError:
+            con.close()
 
     def searchBooks(self, query="", genre=None, language=None, catalogue=None, offset=0, limit=10):
         """Search for books in the database.
@@ -296,26 +322,28 @@ class database:
 
         sql += " ORDER BY bookName LIMIT ? OFFSET ?"
         values += (limit, offset)
-
-        cur.execute(sql, values)
+        try:
+            cur.execute(sql, values)
         
-        results = []
-        for result in cur.fetchall():
-            results.append({
-                "bookID": result[0],
-                "title": result[1],
-                "author": result[2],
-                "isbn": result[3],
-                "publisher": result[4],
-                "publicationDate": result[5],
-                "description": result[6],
-                "pageCount": result[7],
-                "language": result[8],
-                "genre": result[9],
-                "readingAge": result[10]
-            })
-        con.close()
-        return results
+            results = []
+            for result in cur.fetchall():
+                results.append({
+                    "bookID": result[0],
+                    "title": result[1],
+                    "author": result[2],
+                    "isbn": result[3],
+                    "publisher": result[4],
+                    "publicationDate": result[5],
+                    "description": result[6],
+                    "pageCount": result[7],
+                    "language": result[8],
+                    "genre": result[9],
+                    "readingAge": result[10]
+                })
+            con.close()
+            return results
+        except sqlite3.OperationalError:
+            con.close()
     
     def addFile(self, bookID, file):
         """Save the file and update the database.
@@ -346,9 +374,15 @@ class database:
                     ).save(os.path.join(self.directory, hash + ".jpg"), "JPEG")
                 
         con, cur = self.connect()
-        cur.execute("UPDATE books SET fileHash = ? WHERE bookID = ?", (hash, bookID))
-        con.commit()
-        con.close()
+        try:
+            cur.execute("UPDATE books SET fileHash = ? WHERE bookID = ?", (hash, bookID))
+        except sqlite3.IntegrityError:
+            os.remove(epubPath)
+            os.remove(os.path.join(self.directory, hash + ".jpg"))
+            raise ValueError("Book does not exist.")
+        finally:
+            con.commit()
+            con.close()
 
 
 if __name__ == "__main__":

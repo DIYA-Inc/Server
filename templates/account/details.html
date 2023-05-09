@@ -3,11 +3,15 @@
 
 <head>
     {% include("parts/meta.html") %}
-    <title>Account</title>
+    
+    {% include("parts/nav.html") %}
+
+    <title>Account Details</title>
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
 <body>
+    
     <p>Email: {{ user["email"] }}</p>
     <p>Admin: {{ user["admin"] }}</p>
     <p>Created: {{ user["created"] }}</p>
@@ -15,8 +19,20 @@
     <p>Premium Expires: {{ user["premiumExpires"] }}</p>
 
     <br>
-    
-    <a href="/">Home</a>
+
+    <script src="/static/scripts/account/delete.js"></script>
+    <button onclick="deleteAccountButton()">Delete Account</button>
+
+    <br>
+
+    <script src="/static/scripts/account/adminDebug.js"></script>
+    <p>Admin Debug</p>
+    {% if user.admin %}
+    <button onclick="toggleAdminButton(true)">Remove Admin</button>
+    {% else %}
+    <button onclick="toggleAdminButton(false)">Become Admin</button>
+    {% endif %}
+
 </body>
 
 </html>

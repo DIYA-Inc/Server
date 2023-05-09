@@ -36,11 +36,13 @@ class TestServer(TestUtils):
                 "email": email2,
                 "password": password
             })
-            self.assertTrue(400 <= register.status_code < 500)
+            self.assertTrue(400 <= register.status_code <
+                            500, register.status_code)
 
         con, cur = self.db.connect()
         cur.execute("SELECT * FROM users")
         users = cur.fetchall()
+        con.close()
         self.assertEqual(len(users), 1)
 
     def testLoginCorrect(self, email="sus@diya.ink", password="Chungus"):
@@ -51,9 +53,12 @@ class TestServer(TestUtils):
             "password": password
         })
         self.assertTrue(200 <= login.status_code < 400)
-        self.assertTrue(
-            self.client.cookie_jar._cookies["localhost.local"]["/"]["session"].value)
-        
+        try:
+            self.assertTrue(
+                self.client.cookie_jar._cookies["localhost.local"]["/"]["session"].value)
+        except AttributeError:
+            self.assertTrue(len(self.client._cookies))
+
     def testLoginAdmin(self, email="admintest@diya.ink", password="Ligma222"):
         """Tests logging in as an admin"""
         self.testRegister(email, password)
@@ -182,20 +187,23 @@ class TestServer(TestUtils):
     def testAddFileNew(self):
         """Tests uploading a file to a new book."""
         self.testLoginAdmin()
-        
-        addBook = self.client.post("/admin/books/add", data={
-            **sampleBookMetadata[1],
-            "catalogues": ", ".join(sampleBookMetadata[1]["catalogues"]),
-            "file": open(os.path.join(os.path.dirname(__file__), "data/book.epub"), "rb")},
-            content_type="multipart/form-data")
+        with open(os.path.join(os.path.dirname(
+                __file__), "data/book.epub"), "rb") as file:
+            addBook = self.client.post("/admin/books/add", data={
+                **sampleBookMetadata[1],
+                "catalogues": ", ".join(sampleBookMetadata[1]["catalogues"]),
+                "file": file},
+                content_type="multipart/form-data")
         
         return self.verifyFileAdded(addBook)
 
     def testAddFileEdit(self):
         """Tests uploading a file to an existing book."""
         self.testAddBook()
-        editBook = self.client.post("/admin/books/edit/1", data={
-            "file": open(os.path.join(os.path.dirname(__file__), "data/book.epub"), "rb")},
+        with open(os.path.join(os.path.dirname(
+                __file__), "data/book.epub"), "rb") as file:
+            editBook = self.client.post("/admin/books/edit/1", data={
+            "file": file},
             content_type="multipart/form-data")
 
         self.verifyFileAdded(editBook)
@@ -219,11 +227,11 @@ class TestServer(TestUtils):
     def testFileDelete(self):
         """Tests adding a book with a file, then deleting to verify the file is gone."""
         imageUrl = self.testAddFileNew()
-        imageBeforeDelete = self.client.get(imageUrl)
+        imageBeforeDelete = self.client.get(imageUrl).data
         deleteBook = self.client.delete("/admin/books/delete/1")
         self.assertTrue(200 <= deleteBook.status_code < 400)
         imageAfterDelete = self.client.get(imageUrl)
-        self.assertNotEqual(imageBeforeDelete.data, imageAfterDelete.data)
+        self.assertNotEqual(imageBeforeDelete, imageAfterDelete.data)
 
 
 if __name__ == "__main__":

@@ -101,7 +101,27 @@ def deleteAccount():
 
     db.deleteUser(flask.session["user"]["id"])
     flask.session.clear()
-    return flask.redirect("/")
+    return "OK", 200
+
+
+@diya.route("/account/toggleAdmin", methods=["GET"])
+def toggleAdmin():
+    """Temporary route to toggle admin status for debugging."""
+    if "user" not in flask.session:
+        return flask.redirect("/account/login")
+
+    con, cur = db.connect()
+    accessLevel = cur.execute("SELECT userAccessLevel FROM users WHERE userID = ?",
+                              (flask.session["user"]["id"],)).fetchone()[0] ^ 8
+    cur.execute("UPDATE users SET userAccessLevel = ? WHERE userID = ?",
+                (accessLevel, flask.session["user"]["id"]))
+    con.commit()
+    con.close()
+
+    if accessLevel >= 2:
+        return "Account is now an admin"
+    else:
+        return "Account is no longer an admin"
 
 
 if "__main__" == __name__:
