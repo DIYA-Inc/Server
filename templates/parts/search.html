@@ -1,0 +1,67 @@
+<style>
+    .filterSearchSettings {
+        margin-top: 10px;
+        font-size: 18px;
+    }
+  
+    .filterSearchSettings details {
+        width: 99%;
+        margin: 0 auto ;
+        background: #ffffff;
+        margin-bottom: .5rem;
+        box-shadow: 0 .1rem 1rem -.5rem rgba(0,0,0,.4);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    
+    .filterSearchSettings summary {
+        padding: 1rem;
+        display: block;
+        background: #9e9e9e;
+        padding-left: 2rem;
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .filterSearchSettings summary:before {
+        content: '';
+        border-width: .4rem;
+        border-style: solid;
+        border-color: transparent transparent transparent #000000;
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        transform: rotate(0);
+        transform-origin: .2rem 50%;
+        transition: .25s transform ease;
+    }
+    
+    .filterSearchSettings details[open] > summary:before {
+        transform: rotate(90deg);
+    }
+    
+    .filterSearchSettings details summary::-webkit-details-marker {
+        display:none;
+    }
+
+</style>
+
+<form action="/api/books/search">
+    <input type="text" name="query" id="query" placeholder="Search..." required>
+    <div class="filterSearchSettings">
+        <details>
+            <summary>
+                Filters
+            </summary>
+            <label for="genre">Genre</label>
+                <input type="text" name="genre" id="genre">
+
+                <label for="language">Language</label>
+                <input type="text" name="language" id="language">
+                
+                <label for="catalogue">Catalouge</label>
+                <input type="text" name="catalouge" id="catalouge">
+        </details>
+    </div>
+    <button type="submit">Go</button>
+</form>
