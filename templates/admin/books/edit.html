@@ -60,6 +60,10 @@
         <input type="submit" value="Edit book">
     </form>
 
+    <h1> Delete book </h1>
+
+    <button onclick="{{ 'deleteBookButton(' + bookID + ')' }}">Delete Book</button>
+
     <h1> Current Details </h1>
     
     <!-- make this be the default values in the form -->
@@ -79,6 +83,8 @@
     <img src="{{ book['coverURL'] }}" alt="Cover Image">
     
     {% if book["fileURL"] %}
-    <br><br><a href="/books/read/{{ book['bookID'] }}">Read Book</a>
+    <br><br><a href="/books/read/{{ bookID }}">Read Book</a>
     {% endif %}
+
+    <script src="/static/scripts/admin/books/edit.js"></script>
 </body>

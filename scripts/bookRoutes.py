@@ -17,7 +17,7 @@ def viewBook(bookID):
     except ValueError:
         raise flask.abort(404, "The book you were looking for was not found.")
         
-    return flask.render_template("books/view.html", book=book)
+    return flask.render_template("books/view.html", book=book, user=flask.session["user"])
 
 
 @diya.route("/books/read/<int:bookID>", methods=["GET"])
@@ -80,7 +80,7 @@ def editBook(bookID):
         return flask.abort(403, "You do not have permission to edit a book.")
 
     if "POST" != flask.request.method:
-        return flask.render_template("admin/books/edit.html", book=db.getBookMetadata(bookID), bookID=bookID)
+        return flask.render_template("admin/books/edit.html", book=db.getBookMetadata(bookID), bookID=str(bookID))
 
     db.updateBookMetadata(bookID, **getBookFieldsFromForm())
     addBookFile(bookID, flask.request.files)
