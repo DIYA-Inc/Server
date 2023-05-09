@@ -116,9 +116,9 @@ def bookSearch():
         return flask.redirect(flask.url_for("diyaAccounts.loginPage", next=flask.request.url))
     
     query = flask.request.args.get("query", "")
-    genre = flask.request.args.get("genre", None)
-    language = flask.request.args.get("language", None)
-    catalogue = flask.request.args.get("catalogue", None)
+    genre = flask.request.args.get("genre", None) or None
+    language = flask.request.args.get("language", None) or None
+    catalogue = flask.request.args.get("catalogue", None) or None
 
     try:
         offset = int(flask.request.args.get("offset", 0))
