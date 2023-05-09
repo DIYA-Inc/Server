@@ -20,7 +20,6 @@ def welcome():
         return flask.render_template("welcome.html")
 
 
-@diya.errorhandler(404)
 def errorPage(error):
     """Return the error page."""
     return flask.render_template("error.html", error=error), error.code
