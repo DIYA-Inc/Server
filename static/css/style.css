@@ -3,10 +3,11 @@
 }
 
 body {
+    padding:2%;
     max-width: 800px;
     margin: 0 auto;
-    background: #232629;
-    color: #fff;
+    background: #ffffff;
+    color: #000000;
 }
 
 h1, h2 {
@@ -16,17 +17,20 @@ h1, h2 {
 }
 
 h3{
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #fff;
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
     text-align:center;
     border-width: 3px;
   
 }
 
+
+
 input, button {
-    background-color: #2f3438;
-    border: 2px inset #585858;
-    color: #fff;
+
+    width: 50%;
+    border: 2px inset #000000;
+   
 }
 
 a {
