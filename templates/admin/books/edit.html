@@ -52,7 +52,11 @@
         right now the server supports comma seperated values
         "catalogue1, catalogue2, catalogue3"-->
         <label for="catalogues">Catalogues</label><br>
-        <input type="text" name="catalogues" id="catalogues" value="{{ book['catalogues'] }}"><br>
+        <select id="language" name="language">
+            {% for catalouge in book['catalogues'] %}
+            <option value="{{ catalouge }}">{{ catalouge }}</option>
+            {% endfor %}
+        </select><br>
 
         <label for="file">File</label><br>
         <input type="file" name="file" id="file" accept=".epub"><br>
