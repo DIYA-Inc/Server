@@ -25,11 +25,12 @@
     
     <div id="admin">
         {% if user.admin%}
-    <h3>Admin Books</h3>
+        
+        <h3>Admin Books</h3>
 
-        <a id= "addBooks" href="/admin/books/add">Add Book</a>
+        <a id= "addBooks" href="/admin/books/add">Add Book</a><br>
         {% for book in books %}
-        <a id= "editBooks" href="/admin/books/edit/{{ book.bookID }}">Edit {{ book.title }}</a>
+        <a id= "editBooks" href="/admin/books/edit/{{ book.bookID }}">Edit {{ book.title }}</a><br>
         {% endfor %}
 
         {% endif %}
