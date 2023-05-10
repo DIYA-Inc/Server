@@ -17,20 +17,28 @@
 
         <form method="post" action="/account/register" class="container">
             <div class="row">
+                <p style="color:red;display: none;" id="passwordError">
+                    Passwords must be at least 12 characters long, contain an uppercase and lowercase character, number, and a special character.
+                </p>
                 <div class="col"><input type="email" name="email" id="email" {% if email %} value="{{ email }}" {% endif %} required="" minlength="8" placeholder="Email address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" style="padding-left: 2px;margin-bottom: 5px;width: 50%;max-width: 200px;"></div>
             </div>
             <div class="row">
-                <div class="col"><input type="password" name="password" id="password" placeholder="Password" style="padding-left: 2px;width: 50%;max-width: 200px;" maxlength="128" minlength="8"></div>
+                <div class="col"><input type="password" name="password" id="password" placeholder="Password" style="padding-left: 2px;width: 50%;max-width: 200px;" maxlength="128" minlength="12"></div>
             </div>
             <div class="row" style="margin-top: 15px;">
-                <div class="col"><input class="btn btn-primary btn-sm text-center border rounded-pill" role="button" type="submit" style="width: 50%;backdrop-filter: blur(0px);font-size: 12px;max-width: 200px;" value="Register"></div>
+                <div class="col">
+                    <input class="btn btn-primary btn-sm text-center border rounded-pill" role="button" type="submit" style="width: 50%;backdrop-filter: blur(0px);font-size: 12px;max-width: 200px;" value="Register"></div>
+            </div>
+            <div class="row">
+                <p style="font-size: 12px;">By clicking Register, you agree to our <a href="/static/privacyPolicy.txt">Privacy Policy</a>.</p>
             </div>
             <div class="col">
                 <br>
                 <p style="font-size: 12px;">Already have an account? <a href="login"> Login</a></p>
             </div>
-        </div>
+        </form>
     </div>
+    <script src="/static/scripts/account/register.js"></script>
     <script src="/static/scripts/bootstrap.min.js"></script>
 </body>
 

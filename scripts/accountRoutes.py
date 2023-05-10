@@ -52,7 +52,7 @@ def register():
     email = flask.request.form["email"]
     password = flask.request.form["password"]
 
-    if email == None or password == None or len(email) > 128 or (
+    if email == None or password == None or len(password) < 12 or len(email) > 128 or (
             not re.match("[a-zA-Z0-9][^@]+[a-zA-Z0-9]@[a-zA-Z0-9\-\.]+\.[a-zA-Z0-9\-\.]+[a-zA-Z0-9]$", email)):
         return flask.render_template("account/register.html", error="Invalid email or password."), 422
 

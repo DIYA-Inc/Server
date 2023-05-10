@@ -20,7 +20,7 @@ class TestServer(TestUtils):
         self.client = app.test_client()
         self.db = app.db
 
-    def testRegister(self, email="joe@joeblakeb.com", password="Password123"):
+    def testRegister(self, email="joe@joeblakeb.com", password="Password1234"):
         """Tests registering a new."""
         register = self.client.post("/account/register", data={
             "email": email,
@@ -28,7 +28,7 @@ class TestServer(TestUtils):
         })
         self.assertTrue(200 <= register.status_code < 400)
 
-    def testRegisterInvalid(self, email="mung@diya.ink", password="Amungus2"):
+    def testRegisterInvalid(self, email="mung@diya.ink", password="Amungus23456"):
         """Server should not allow two users with the same email address."""
         self.testRegister(email, password)
         for email2 in (email, email.upper(), "invalid"):
@@ -45,7 +45,7 @@ class TestServer(TestUtils):
         con.close()
         self.assertEqual(len(users), 1)
 
-    def testLoginCorrect(self, email="sus@diya.ink", password="Chungus"):
+    def testLoginCorrect(self, email="sus@diya.ink", password="Chungus12345"):
         """Tests logging in with a correct email and password."""
         self.testRegister(email, password)
         login = self.client.post("/account/login", data={
@@ -59,7 +59,7 @@ class TestServer(TestUtils):
         except AttributeError:
             self.assertTrue(len(self.client._cookies))
 
-    def testLoginAdmin(self, email="admintest@diya.ink", password="Ligma222"):
+    def testLoginAdmin(self, email="admintest@diya.ink", password="Ligma2221234"):
         """Tests logging in as an admin"""
         self.testRegister(email, password)
         con, cur = self.db.connect()
@@ -73,7 +73,7 @@ class TestServer(TestUtils):
         })
         self.assertTrue(200 <= login.status_code < 400)
 
-    def testLoginIncorrect(self, email="among@diya.ink", password="wordPass12"):
+    def testLoginIncorrect(self, email="among@diya.ink", password="wordPass1234"):
         """Tests logging in with an incorrect email and password."""
         self.testRegister(email, password)
         for email2 in (email, "bruh@diya.ink"):
@@ -83,7 +83,7 @@ class TestServer(TestUtils):
             })
             self.assertTrue(400 <= login.status_code < 500)
 
-    def testLogout(self, email="test@example.com", password="PassWord123"):
+    def testLogout(self, email="test@example.com", password="PassWord1234"):
         """Tests logging in and then out."""
         self.testLoginCorrect(email, password)
         logout = self.client.get("/account/logout")
@@ -97,7 +97,7 @@ class TestServer(TestUtils):
         details = self.client.get("/account/details")
         self.assertEqual(details.status_code, 200)
 
-    def testDeleteAccount(self, email="delete@account.com", password="Password123"):
+    def testDeleteAccount(self, email="delete@account.com", password="Password1234"):
         """Tests deleting an account."""
         self.testLoginCorrect(email, password)
         delete = self.client.delete("/account/delete")
