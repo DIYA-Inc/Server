@@ -30,7 +30,7 @@
         <textarea name="description" id="description">{{ book['description'] }}</textarea><br>
 
         <label for="pageCount">Page Count</label><br>
-        <input type="number" name="pageCount" id="pageCount" value="{{ book['pageCount'] }}"><br>
+        <input type="number" name="pageCount" id="pageCount" value="{{ book['pageCount'] }}"><br><br>
 
         <!-- Make this be ISO 3166 Alpha 3 country codes
         https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
@@ -51,12 +51,10 @@
         <!-- This should be a list of catalogues
         right now the server supports comma seperated values
         "catalogue1, catalogue2, catalogue3"-->
+
         <label for="catalogues">Catalogues</label><br>
-        <select id="language" name="language">
-            {% for catalouge in book['catalogues'] %}
-            <option value="{{ catalouge }}">{{ catalouge }}</option>
-            {% endfor %}
-        </select><br>
+        <input type="text" name="catalogues" id="catalogues" value="{{ book['catalogues'] }}"><br>
+        <p>example for multiple catalogues: "catalogue1, catalogue2, catalogue3"</p>
 
         <label for="file">File</label><br>
         <input type="file" name="file" id="file" accept=".epub"><br>
