@@ -3,13 +3,11 @@
  */
 
 var passwordInput = document.getElementById("password");
-var passwordError = document.getElementById("passwordError");
 
 document.getElementsByTagName("form")[0].addEventListener("submit", function (event) {
     if (verifyPassword(passwordInput.value)) {
         return form.submit();
     } else {
-        passwordError.style.display = "block";
         androidCompat.showToast("Password is not strong enough.");
     }
     event.preventDefault();

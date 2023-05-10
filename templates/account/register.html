@@ -17,9 +17,6 @@
 
         <form method="post" action="/account/register" class="container">
             <div class="row">
-                <p style="color:red;display: none;" id="passwordError">
-                    Passwords must be at least 12 characters long, contain an uppercase and lowercase character, number, and a special character.
-                </p>
                 <div class="col"><input type="email" name="email" id="email" {% if email %} value="{{ email }}" {% endif %} required="" minlength="8" placeholder="Email address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" style="padding-left: 2px;margin-bottom: 5px;width: 50%;max-width: 200px;"></div>
             </div>
             <div class="row">
@@ -31,9 +28,14 @@
             </div>
             <div class="row">
                 <p style="font-size: 12px;">By clicking Register, you agree to our <a href="/static/privacyPolicy.txt">Privacy Policy</a>.</p>
+                <p style="font-size: 12px;">
+                    Your pasword must:<br>
+                    Be at least 12 characters long<br>
+                    Contain uppercase, lowercase, and numbers<br>
+                    Contain at least one special character<br>
+                </p>
             </div>
             <div class="col">
-                <br>
                 <p style="font-size: 12px;">Already have an account? <a href="login"> Login</a></p>
             </div>
         </form>
