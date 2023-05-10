@@ -304,7 +304,7 @@ class database:
         con, cur = self.connect()
         sql = """
             SELECT DISTINCT books.bookID, bookName, author, ISBN, publisher, publicationDate,
-                description, pageCount, language, genre, readingAge
+                description, pageCount, language, genre, readingAge, fileHash
             FROM books  LEFT JOIN bookCatalogueLink ON books.bookID = bookCatalogueLink.bookID
                         LEFT JOIN bookCatalogues ON bookCatalogueLink.catalogueID = bookCatalogues.catalogueID
             WHERE   (bookName LIKE ? OR author LIKE ? OR description LIKE ?) """
@@ -338,7 +338,8 @@ class database:
                     "pageCount": result[7],
                     "language": result[8],
                     "genre": result[9],
-                    "readingAge": result[10]
+                    "readingAge": result[10],
+                    "coverURL": "/static/img/cover.jpg" if not result[11] else "/books/cover/" + result[11] + ".jpg"
                 })
             con.close()
             return results
