@@ -100,6 +100,31 @@ def deleteBook(bookID):
     return "Book deleted"
 
 
+@diya.route("/books/search", methods=["GET"])
+def welcome():
+    """Return a search result
+    
+    
+    URL Parameters:
+        query: The query to search for in the title, author, and description.
+        genre: The genre to limit the search to.
+        language: The language to limit the search to.
+        catalogue: The catalogue to limit the search to.
+        offset: The offset to start at, default 0."""
+    user = flask.session.get("user")
+    if user == None:
+        return flask.redirect(flask.url_for("diyaAccounts.loginPage", next=flask.request.url))
+    
+    query = flask.request.args.get("query", "")
+    genre = flask.request.args.get("genre", None) or None
+    language = flask.request.args.get("language", None) or None
+    catalogue = flask.request.args.get("catalogue", None) or None
+    
+    books = db.searchBooks(query, genre, language, catalogue, limit=1024)
+
+    return flask.render_template("books/search.html", books=books, user=user)
+
+
 @diya.route("/api/books/search", methods=["GET"])
 def bookSearch():
     """API for searching for books.

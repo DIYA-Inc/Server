@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include("parts/meta.html") %}
+
+    {% include("parts/nav.html")%}
+
+    <title>Search</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    {% for book in books %}
+    <a id="bookList" href="/books/view/{{ book.bookID }}">{{ book.title }} {{ book.author }}</a><br>
+    <img src="{{ book.coverURL }}">
+    {% endfor %}
+</body>
+
+</html>
