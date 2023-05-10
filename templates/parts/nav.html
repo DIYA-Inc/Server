@@ -48,20 +48,49 @@
     <a href="/" id="home">Home</a>
     <a href="/account/logout" id="LogOut">Log Out</a>
     <a href="/account/details" id="accDetails">Account Details</a>
-    
-    <form action="/api/books/search">
-        <input type="text" name="query" id="query" placeholder="Search..." required>
+    <form name="searchForm" action id="searchForm">
+        <input type="text" name="query" id="query" placeholder="Search..." required class="searchInput">
         <div class="filterSearchSettings">
             <details>
                 <summary>
                     Filter Search
                 </summary>
-                <label for="genre">Genre</label>
-                    <input type="text" name="genre" id="genre" placeholder="Genre">
-                    <input type="text" name="language" id="language" placeholder="Language">
-                    <input type="text" name="catalouge" id="catalouge" placeholder="Catalouge">
+                    <input type="text" name="genre" id="genre" placeholder="Genre" class="searchInput">
+                    <input type="text" name="language" id="language" placeholder="Language" class="searchInput">
+                    <input type="text" name="catalouge" id="catalouge" placeholder="Catalouge" class="searchInput">
             </details>
+            <button type="submit" onclick="search()">Go</button>
         </div>
-        <button type="submit">Go</button>
     </form>
 </nav>
+
+<script> 
+    function search() {
+        let xhr = new XMLHttpRequest();
+        let url = new URL("http://diya.ink/api/books/search")
+        let inputs = [...document.getElementsByClassName("searchInput")];
+        let data = {};
+
+        inputs.forEach(e => {
+            if(e.value != "") 
+                data[e.id] =  e.value;
+        });
+    
+        xhr.onload = function() {
+            if (xhr.status != 200) { 
+                alert(`Error ${xhr.status}: ${xhr.statusText}`);
+            } else {
+                location.href = "http://diya.ink";
+                books = xhr.response;
+                alert(xhr.response);
+            }
+        };
+    
+        xhr.onerror = function() {
+            alert(`Network Error`);
+        };
+    
+        xhr.open("GET", url, true);
+        xhr.send(data);
+    }
+</script>
