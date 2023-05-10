@@ -67,30 +67,28 @@
 <script> 
     function search() {
         let xhr = new XMLHttpRequest();
-        let url = new URL("http://diya.ink/api/books/search")
+        let url = new URL("https://diya.ink/api/books/search")
         let inputs = [...document.getElementsByClassName("searchInput")];
-        let data = {};
 
         inputs.forEach(e => {
-            if(e.value != "") 
-                data[e.id] =  e.value;
+            if(e.value != "") url.searchParams.append(e.id, e.value);
         });
     
         xhr.onload = function() {
             if (xhr.status != 200) { 
                 alert(`Error ${xhr.status}: ${xhr.statusText}`);
             } else {
-                location.href = "http://diya.ink";
-                books = xhr.response;
-                alert(xhr.response);
+                location.href = "/";
+                xhr.timeout = 1000;
+                alert(`${xhr.status} \n ${xhr.response}`);
             }
         };
     
         xhr.onerror = function() {
-            alert(`Network Error`);
+            alert(`Network Error ${xhr.status} \n ${xhr.statusText}`);
         };
     
         xhr.open("GET", url, true);
-        xhr.send(data);
+        xhr.send();
     }
 </script>
