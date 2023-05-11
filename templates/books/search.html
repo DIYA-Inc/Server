@@ -10,10 +10,20 @@
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
+<style>
+    .bookResult {
+        display: flex;
+        border: grey 3px outset;
+        overflow: hidden;
+    }
+</style>
+
 <body>
     {% for book in books %}
-    <a id="bookList" href="/books/view/{{ book.bookID }}">{{ book.title }} {{ book.author }}</a><br>
-    <img src="{{ book.coverURL }}">
+    <div class="bookResult">
+        <img src="{{ book.coverURL }}">
+        <a id="bookList" href="/books/view/{{ book.bookID }}">{{ book.title }}<br>By: {{ book.author }}<br>{{ book.description }}</a><br>
+    </div>
     {% endfor %}
 </body>
 
