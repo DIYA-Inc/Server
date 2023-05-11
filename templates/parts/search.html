@@ -1,0 +1,25 @@
+{% if books %}
+{% for book in books %}
+<div class="bookResult" onclick="location.href='/books/view/{{ book.bookID }}'">
+    <img src="{{ book.coverURL }}">
+
+    <div class="resultDetails">
+        <p>{{ book.title }}</p>
+        <p class="detailsHeading">Author:</p>
+        <p>{{ book.author }}</p>
+
+        {% if book.genre %}
+        <p class="detailsHeading">Genre:</p>
+        <p>{{ book.genre }}</p>
+        {% endif %}
+
+        {% if book.publicationDate %}
+        <p class="detailsHeading">Year:</p>
+        <p>{{ book.publicationDate[0:4] }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<p>No books found</p>
+{% endif %}

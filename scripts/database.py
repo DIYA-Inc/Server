@@ -289,7 +289,7 @@ class database:
         except sqlite3.OperationalError:
             con.close()
 
-    def searchBooks(self, query="", genre=None, language=None, catalogue=None, offset=0, limit=10):
+    def searchBooks(self, query="", genre=None, language=None, catalogue=None, offset=0, limit=10, sort="bookName"):
         """Search for books in the database.
 
         Args:
@@ -320,7 +320,7 @@ class database:
             sql += " AND bookCatalogues.catalogueName LIKE ? "
             values += (catalogue,)
 
-        sql += " ORDER BY bookName LIMIT ? OFFSET ?"
+        sql += " ORDER BY " + sort + " LIMIT ? OFFSET ?"
         values += (limit, offset)
         try:
             cur.execute(sql, values)

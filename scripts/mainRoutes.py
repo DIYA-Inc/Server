@@ -15,7 +15,7 @@ def static(path):
 def welcome():
     """Return the welcome page."""
     if "user" in flask.session:
-        return flask.render_template("index.html", user=flask.session["user"], books=db.searchBooks(limit=1000))
+        return flask.render_template("index.html", user=flask.session["user"], books=db.searchBooks(limit=4, sort="RANDOM()"))
     else:
         return flask.render_template("welcome.html")
 

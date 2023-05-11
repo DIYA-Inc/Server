@@ -3,40 +3,22 @@
 
 <head>
     {% include("parts/meta.html") %}
-
-    {% include("parts/nav.html")%}
-
     <title>Site Map</title>
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
 <body>
+    {% include("parts/nav.html")%}
     <h2>Welcome {{ user["email"] }}!</h2>
     
-    <div id="bookList">
-    <h3>Books</h3>
-    
-        {% for book in books %}
-        <a id= "bookList" href="/books/view/{{ book.bookID }}">{{ book.title }}</a><br>
-        {% endfor %}
-    
-
-    </div>
-    
+    {% if user.admin%}
     <div id="admin">
-        {% if user.admin%}
-        
-        <h3>Admin Books</h3>
-
-        <a id= "addBooks" href="/admin/books/add">Add Book</a><br>
-        {% for book in books %}
-        <a id= "editBooks" href="/admin/books/edit/{{ book.bookID }}">Edit {{ book.title }}</a><br>
-        {% endfor %}
-
-        {% endif %}
+        <a class="button" id="addBooks" href="/admin/books/add">Add a Book</a><br>
     </div>
-    
-    
+    {% endif %}
+
+    <h1>Featured Books</h1>
+    {% include("parts/search.html") %}
 </body>
 
 </html>
