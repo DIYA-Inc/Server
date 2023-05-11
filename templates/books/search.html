@@ -15,12 +15,16 @@
         display: flex;
         border: grey 3px outset;
         overflow: hidden;
+        cursor: pointer;
+    }
+    .bookResult > * :not(img) {
+        padding:  0.1rem;
     }
 </style>
 
 <body>
     {% for book in books %}
-    <div class="bookResult">
+    <div class="bookResult" onclick="location.href='/books/view/{{ book.bookID }}'">
         <img src="{{ book.coverURL }}">
         <a id="bookList" href="/books/view/{{ book.bookID }}">{{ book.title }}<br>By: {{ book.author }}<br>{{ book.description }}</a><br>
     </div>
