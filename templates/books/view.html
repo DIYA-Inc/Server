@@ -3,50 +3,32 @@
 
 <head>
     {% include("parts/meta.html") %}
-    <title>{{ book["title"] }}</title>
+    <title>{{ book.title }}</title>
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
-<style>
-    .container {
-        display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        grid-template-rows: 1fr 1fr; 
-        gap: 0px 0px; 
-        grid-template-areas: 
-            "BookCover BookInfo ."
-            "BookCover BookInfo ."
-            ". . .";
-        border: 5px grey outset;
-    }
-    .BookCover { grid-area: BookCover; }
-    .BookInfo { 
-        grid-area: BookInfo;
-        padding: 0.5rem;    
-    }
-</style>
-
 <body>
     <div class="container">
-        <div class="BookCover"><img src="{{ book['coverURL'] }}" alt="Cover Image"></div>
+        <div class="BookCover"><img src="{{ book.coverURL }}" alt="Cover Image"></div>
         <div class="BookInfo">
-            <p><b>Title: </b>{{ book["title"] }}</p>
-            <p><b>Author: </b>{{ book["author"] }}</p>
-            <p><b>ISBN: </b>{{ book["isbn"] }}</p>
-            <p><b>Publisher: </b>{{ book["publisher"] }}</p>
-            <p><b>Publication Date: </b>{{ book["publicationDate"] }}</p>
-            <p><b>Description: </b>{{ book["description"] }}</p>
-            <p><b>Page Count: </b>{{ book["pageCount"] }}</p>
-            <p><b>Language: </b>{{ book["language"] }}</p>
-            <p><b>Genre: </b>{{ book["genre"] }}</p>
-            <p><b>Reading Age: </b>{{ book["readingAge"] }}</p>
-            <p><b>Catalogues: </b>{{ book["catalogues"] }}</p><br>
+            <p><b>Title: </b>{{ book.title }}</p>
+            <p><b>Author: </b>{{ book.author }}</p>
+            <p><b>ISBN: </b>{{ book.isbn }}</p>
+
+            {% if book.publisher %}<p><b>Publisher: </b>{{ book.publisher }}</p>{% endif %}
+            {% if book.publicationDate %}<p><b>Publication Date: </b>{{ book.publicationDate }}</p>{% endif %}
+            {% if book.description %}<p><b>Description: </b>{{ book.description }}</p>{% endif %}
+            {% if book.pageCount %}<p><b>Page Count: </b>{{ book.pageCount }}</p>{% endif %}
+            {% if language %}<p><b>Language: </b>{{ language }}</p>{% endif %}
+            {% if book.genre %}<p><b>Genre: </b>{{ book.genre }}</p>{% endif %}
+            {% if book.readingAge %}<p><b>Reading Age: </b>{{ book.readingAge }}</p>{% endif %}
+            {% if book.catalogues %}<p><b>Catalogues: </b>{{ ', '.join(book.catalogues) }}</p>{% endif %}
             
             {% if user.admin %}
-            <a href="/admin/books/edit/{{ book['bookID'] }}">Edit Book</a><br>
+            <a href="/admin/books/edit/{{ book.bookID }}">Edit Book</a><br>
             {% endif %}
             {% if book["fileURL"] %}
-            <br><br><a href="/books/read/{{ book['bookID'] }}">Read Book</a>
+            <br><br><a href="/books/read/{{ book.bookID }}">Read Book</a>
             {% endif %}
             </div>
     </div>

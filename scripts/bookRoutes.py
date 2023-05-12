@@ -17,7 +17,7 @@ def viewBook(bookID):
     except ValueError:
         raise flask.abort(404, "The book you were looking for was not found.")
         
-    return flask.render_template("books/view.html", book=book, user=flask.session["user"])
+    return flask.render_template("books/view.html", book=book, user=flask.session["user"], language=getLanguageOrNone(book["language"]))
 
 
 @diya.route("/books/read/<int:bookID>", methods=["GET"])
@@ -194,6 +194,14 @@ def readLanguageCodes():
 
 
 languageCodes = readLanguageCodes()
+
+
+def getLanguageOrNone(code):
+    """Get the language code from the request or None."""
+    code = str(code).lower()
+    if code in languageCodes:
+        return languageCodes[code]
+    return None
 
 
 if "__main__" == __name__:

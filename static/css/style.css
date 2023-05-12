@@ -123,3 +123,24 @@ title {
     margin-right: auto;
     border-radius: 4px;
 }
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+        "BookCover BookInfo ."
+        "BookCover BookInfo ."
+        ". . .";
+    border: 5px grey outset;
+}
+
+.BookCover {
+    grid-area: BookCover;
+}
+
+.BookInfo {
+    grid-area: BookInfo;
+    padding: 0.5rem;
+}
