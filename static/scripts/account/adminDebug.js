@@ -31,7 +31,7 @@ function toggleAdmin() {
     xhr.open("GET", "/account/toggleAdmin", true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
-            androidCompat.showToast(xhr.responseText);
+            androidCompat.showToast(xhr.responseText + ", please sign in again.");
             var xhrLogout = new XMLHttpRequest();
             xhrLogout.open("GET", "/account/logout", true);
             xhrLogout.onreadystatechange = function () {

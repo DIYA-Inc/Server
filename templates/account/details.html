@@ -10,29 +10,48 @@
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
-<body>
-    
+<body id="accountDetails">
+    <div class="center">
     <p>Email: {{ user["email"] }}</p>
+    </div>
+
+    <div class="center box">
+    <h2>Manage Subscription</h2>
+    <p>Account Created: {{ user.created[:10] }}</p>
+    {% if user.premium %}
+    <p>Account Type: Premium</p>
+        {% if user.premiumExpires %}
+        <p>Expires: {{ user.premiumExpires }}</p>
+        {% else %}
+        <p>Expires: Never</p>
+        {% endif %}
+    {% else %}
+    <p>Account Type: Free</p>
+    {% endif %}
+    </div>
+
+    <div class="center">
+    <a href="/account/logout"><p class="button smallButton">
+        Log Out
+    </p></a><br>
+    <button class="smallButton red" onclick="deleteAccountButton()">Delete Account</button>
+    <br><br>
+    </div>
+
+    <div class="center box">
+    <h2>Admin Debug</h2>
     <p>Admin: {{ user["admin"] }}</p>
-    <p>Created: {{ user["created"] }}</p>
-    <p>Premium: {{ user["premium"] }}</p>
-    <p>Premium Expires: {{ user["premiumExpires"] }}</p>
 
-    <br>
-
-    <script src="/static/scripts/account/delete.js"></script>
-    <button onclick="deleteAccountButton()">Delete Account</button>
-
-    <br>
-
-    <script src="/static/scripts/account/adminDebug.js"></script>
-    <p>Admin Debug</p>
     {% if user.admin %}
     <button onclick="toggleAdminButton(true)">Remove Admin</button>
     {% else %}
     <button onclick="toggleAdminButton(false)">Become Admin</button>
     {% endif %}
+    <br><br>
+    </div>
 
+    <script src="/static/scripts/account/delete.js"></script>
+    <script src="/static/scripts/account/adminDebug.js"></script>
 </body>
 
 </html>
