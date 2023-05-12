@@ -63,7 +63,7 @@ def addBook():
         return flask.abort(403, "You do not have permission to add a book.")
 
     if "POST" != flask.request.method:
-        return flask.render_template("admin/books/add.html")
+        return flask.render_template("admin/books/add.html", languageCodes=languageCodes)
     
     bookID = db.addBookMetadata(**getBookFieldsFromForm())
     addBookFile(bookID, flask.request.files)
@@ -80,7 +80,7 @@ def editBook(bookID):
         return flask.abort(403, "You do not have permission to edit a book.")
 
     if "POST" != flask.request.method:
-        return flask.render_template("admin/books/edit.html", book=db.getBookMetadata(bookID), bookID=str(bookID))
+        return flask.render_template("admin/books/edit.html", book=db.getBookMetadata(bookID), bookID=str(bookID), languageCodes=languageCodes)
 
     db.updateBookMetadata(bookID, **getBookFieldsFromForm())
     addBookFile(bookID, flask.request.files)
@@ -184,6 +184,16 @@ def addBookFile(bookID, files):
         return
     
     db.addFile(bookID, file.read())
+
+
+def readLanguageCodes():
+    """Get a list of language codes and names.
+    {code: name}"""
+    with open("scripts/languageCodes.csv") as file:
+        return {line.split(",")[0]: line.split(",")[1].strip() for line in file.readlines()[1:]}
+
+
+languageCodes = readLanguageCodes()
 
 
 if "__main__" == __name__:

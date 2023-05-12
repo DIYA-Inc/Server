@@ -1,0 +1,6 @@
+<label for="language">Language</label><br>
+<select id="language" name="language">
+    {% for code, language in languageCodes.items() %}
+    <option value="{{ code }}" {% if book is defined and code == book.language %} selected="selected" {% endif %}>{{ language }}</option>
+    {% endfor %}
+</select><br>

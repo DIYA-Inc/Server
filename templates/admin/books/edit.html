@@ -4,57 +4,43 @@
 <head>
     {% include("parts/meta.html") %}
     {% include("parts/nav.html")%}
-    <title></title>
+    <title>Edit {{ book.title }}</title>
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
 <body>
-    <!-- There should be max lengths, check scripts/databaseStructure.sql -->
     <form method="post" action="/admin/books/edit/{{ bookID }}" enctype="multipart/form-data">
         <label for="title">Title</label><br>
-        <input type="text" name="title" id="title" value="{{ book['title'] }}"><br>
+        <input type="text" name="title" id="title" maxlength="128" value="{{ book.title }}"><br>
     
         <label for="author">Author</label><br>
-        <input type="text" name="author" id="author" value="{{ book['author'] }}"><br>
+        <input type="text" name="author" id="author" maxlength="64" value="{{ book.author }}"><br>
 
         <label for="isbn">ISBN</label><br>
-        <input type="text" name="isbn" id="isbn" value="{{ book['isbn'] }}"><br>
+        <input type="text" name="isbn" id="isbn" maxlength="16" value="{{ book.isbn }}"><br>
 
         <label for="publisher">Publisher</label><br>
-        <input type="text" name="publisher" id="publisher" value="{{ book['publisher'] }}"><br>
+        <input type="text" name="publisher" id="publisher" maxlength="64" value="{{ book.publisher or '' }}"><br>
 
         <label for="publicationDate">Publication Date</label><br>
-        <input type="date" name="publicationDate" id="publicationDate" value="{{ book['publicationDate'] }}"><br>
+        <input type="date" name="publicationDate" id="publicationDate" value="{{ book.publicationDate or '' }}"><br>
 
         <label for="description">Description</label><br>
-        <textarea name="description" id="description">{{ book['description'] }}</textarea><br>
+        <textarea name="description" id="description" maxlength="512">{{ book.description or '' }}</textarea><br>
 
         <label for="pageCount">Page Count</label><br>
-        <input type="number" name="pageCount" id="pageCount" value="{{ book['pageCount'] }}"><br><br>
+        <input type="number" name="pageCount" id="pageCount" value="{{ book.pageCount or '' }}"><br>
 
-        <!-- Make this be ISO 3166 Alpha 3 country codes
-        https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3
-        maybe a drop down? -->
-        <label for="language">Language</label><br>
-        <select id="language" name="language">
-            <option value="eng">English</option>
-            <option value="fra">French</option>
-            <option value="spa">Spanish</option>
-          </select><br>
+        {% include("parts/languageSelector.html") %}
 
         <label for="genre">Genre</label><br>
-        <input type="text" name="genre" id="genre" value="{{ book['genre'] }}"><br>
+        <input type="text" name="genre" id="genre" maxlength="32" value="{{ book.genre or '' }}"><br>
 
         <label for="readingAge">Reading Age</label><br>
-        <input type="number" name="readingAge" id="readingAge" value="{{ book['readingAge'] }}"><br>
-
-        <!-- This should be a list of catalogues
-        right now the server supports comma seperated values
-        "catalogue1, catalogue2, catalogue3"-->
+        <input type="number" name="readingAge" id="readingAge" value="{{ book.readingAge or '' }}"><br>
 
         <label for="catalogues">Catalogues</label><br>
-        <input type="text" name="catalogues" id="catalogues" value="{{ ', '.join(book['catalogues']) }}">
-        <p>Example: "catalogue1, catalogue2, catalogue3"</p>
+        <input type="text" name="catalogues" id="catalogues" value="{{ ', '.join(book.catalogues) }}" placeholder="catalogue1, catalogue2, ..."><br>
 
         <label for="file">File</label><br>
         <input type="file" name="file" id="file" accept=".epub"><br>
@@ -67,11 +53,7 @@
     <button onclick="{{ 'deleteBookButton(' + bookID + ')' }}">Delete Book</button>
 
 
-    <img src="{{ book['coverURL'] }}" alt="Cover Image">
-    
-    {% if book["fileURL"] %}
-    <br><br><a href="/books/read/{{ bookID }}">Read Book</a>
-    {% endif %}
+    <img src="{{ book.coverURL }}" alt="Cover Image">
 
     <script src="/static/scripts/admin/books/edit.js"></script>
 </body>
