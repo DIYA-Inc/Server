@@ -124,23 +124,60 @@ title {
     border-radius: 4px;
 }
 
-.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 0px 0px;
-    grid-template-areas:
-        "BookCover BookInfo ."
-        "BookCover BookInfo ."
-        ". . .";
-    border: 5px grey outset;
+/* View Book Page */
+
+#viewBook {
+    padding: 0;
+    margin: 0;
 }
 
-.BookCover {
-    grid-area: BookCover;
+.accentBox {
+    background-color: #ccc;
+    padding: 8px;
+    width: calc(100vw - 16px);
 }
 
-.BookInfo {
-    grid-area: BookInfo;
-    padding: 0.5rem;
+.viewTopBar {
+    display: inline;
+    margin: 16px;
+}
+
+.viewTopBar * {
+    font-size: 24px;
+    margin: 0;
+    float: left;
+}
+
+.viewTopBar .backButton {
+    width: 40px;
+}
+
+.viewTopBar .backButton a {
+    padding: 0;
+    color: #000000;
+}
+
+.viewTopBar .bookTitle {
+    width: calc(100vw - 96px);
+}
+
+.viewBookCover {
+    width: 100%;
+    display: flex;
+}
+
+.viewBookCover img {
+    width: 80vw;
+    max-width: 300px;
+    margin: auto;
+}
+
+.twoButtons {
+    margin: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#viewBook #bookDetails {
+    padding: 0 16px 16px 16px;
 }

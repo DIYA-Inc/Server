@@ -7,30 +7,74 @@
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 
-<body>
-    <div class="container">
-        <div class="BookCover"><img src="{{ book.coverURL }}" alt="Cover Image"></div>
-        <div class="BookInfo">
-            <p><b>Title: </b>{{ book.title }}</p>
-            <p><b>Author: </b>{{ book.author }}</p>
-            <p><b>ISBN: </b>{{ book.isbn }}</p>
+<body id="viewBook">
+    <div class="accentBox">
+        <div class="viewTopBar">
+            <p class="backButton"><a href="/" onclick="window.history.back()">🡸</a></p>
+            <p class="bookTitle center">{{ book.title }}</p>
+        </div>
 
-            {% if book.publisher %}<p><b>Publisher: </b>{{ book.publisher }}</p>{% endif %}
-            {% if book.publicationDate %}<p><b>Publication Date: </b>{{ book.publicationDate }}</p>{% endif %}
-            {% if book.description %}<p><b>Description: </b>{{ book.description }}</p>{% endif %}
-            {% if book.pageCount %}<p><b>Page Count: </b>{{ book.pageCount }}</p>{% endif %}
-            {% if language %}<p><b>Language: </b>{{ language }}</p>{% endif %}
-            {% if book.genre %}<p><b>Genre: </b>{{ book.genre }}</p>{% endif %}
-            {% if book.readingAge %}<p><b>Reading Age: </b>{{ book.readingAge }}</p>{% endif %}
-            {% if book.catalogues %}<p><b>Catalogues: </b>{{ ', '.join(book.catalogues) }}</p>{% endif %}
-            
-            {% if user.admin %}
-            <a href="/admin/books/edit/{{ book.bookID }}">Edit Book</a><br>
-            {% endif %}
-            {% if book["fileURL"] %}
-            <br><br><a href="/books/read/{{ book.bookID }}">Read Book</a>
-            {% endif %}
-            </div>
+        <div class="viewBookCover">
+            <img src="{{ book.coverURL }}" alt="{{ book.title }} Cover Image">
+        </div>
+    </div>
+
+    <div class="center twoButtons">
+        {% if book.fileURL %}
+        <p class="button smallButton"> <a href="/books/read/{{ book.bookID }}">
+            Read Book
+        </a> </p>
+        {% endif %}
+        {% if user.admin %}
+        <p class="button smallButton"> <a href="/admin/books/edit/{{ book.bookID }}">
+            Edit Book
+        </a> </p>
+        {% endif %}
+    </div>
+
+    <div id="bookDetails" class="resultDetails">
+        <p class="detailsHeading">Author:</p><p>{{ book.author }}</p>
+        <p class="detailsHeading">ISBN:</p><p>{{ book.isbn }}</p>
+        
+        {% if book.description %}
+            <p class="detailsHeading">Description:</p>
+            <p>{{ book.description }}</p>
+        {% endif %}
+
+        {% if book.publisher %}
+            <p class="detailsHeading">Publisher:</p>
+            <p>{{ book.publisher }}</p>
+        {% endif %}
+
+        {% if book.publicationDate %}
+            <p class="detailsHeading">Publication Date:</p>
+            <p>{{ book.publicationDate }}</p>
+        {% endif %}
+
+        {% if book.pageCount %}
+            <p class="detailsHeading">Page Count:</p>
+            <p>{{ book.pageCount }}</p>
+        {% endif %}
+
+        {% if language %}
+            <p class="detailsHeading">Language:</p>
+            <p>{{ language }}</p>
+        {% endif %}
+
+        {% if book.genre %}
+            <p class="detailsHeading">Genre:</p>
+            <p>{{ book.genre }}</p>
+        {% endif %}
+
+        {% if book.readingAge %}
+            <p class="detailsHeading">Reading Age:</p>
+            <p>{{ book.readingAge }}</p>
+        {% endif %}
+
+        {% if book.catalogues %}
+            <p class="detailsHeading">Catalogues:</p>
+            <p>{{ ', '.join(book.catalogues) }}</p>
+        {% endif %}
     </div>
 </body>
 
