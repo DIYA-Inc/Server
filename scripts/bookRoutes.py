@@ -63,7 +63,7 @@ def addBook():
         return flask.abort(403, "You do not have permission to add a book.")
 
     if "POST" != flask.request.method:
-        return flask.render_template("admin/books/add.html", languageCodes=languageCodes)
+        return flask.render_template("admin/bookForm.html", book=None, languageCodes=languageCodes)
     
     bookID = db.addBookMetadata(**getBookFieldsFromForm())
     addBookFile(bookID, flask.request.files)
@@ -80,7 +80,7 @@ def editBook(bookID):
         return flask.abort(403, "You do not have permission to edit a book.")
 
     if "POST" != flask.request.method:
-        return flask.render_template("admin/books/edit.html", book=db.getBookMetadata(bookID), bookID=str(bookID), languageCodes=languageCodes)
+        return flask.render_template("admin/bookForm.html", book=db.getBookMetadata(bookID), bookID=str(bookID), languageCodes=languageCodes)
 
     db.updateBookMetadata(bookID, **getBookFieldsFromForm())
     addBookFile(bookID, flask.request.files)
