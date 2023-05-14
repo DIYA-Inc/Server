@@ -178,3 +178,62 @@ title {
 #viewBook #bookDetails {
     padding: 0 16px 16px 16px;
 }
+
+/* Add & Edit Book Pages */
+
+#bookForm input,
+#bookForm textarea,
+#bookForm #fileButton {
+    width: calc(100% - 16px);
+    margin: 8px 0;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+
+#bookForm textarea {
+    height: 200px;
+}
+
+#bookForm select {
+    width: 100%;
+    margin: 8px 0;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+
+#bookForm input[type="file"] {
+    display: none;
+}
+
+#bookForm #fileButton {
+    width: 100%;
+}
+
+#bookForm input[type="submit"],
+#deleteBookButton {
+    width: 100%;
+    margin: 24px 0 8px 0;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    background-color: #9e9e9e;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#editTitle {
+    display: inline-block;
+    margin: 0;
+}
+
+#deleteBookButton {
+    margin-top: 8px;
+}
+
+span.required {
+    color: #777
+}
