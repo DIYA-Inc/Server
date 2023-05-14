@@ -149,16 +149,13 @@ title {
 }
 
 .viewTopBar .backButton {
-    width: 40px;
-}
-
-.viewTopBar .backButton a {
+    width: 30px;
     padding: 0;
     color: #000000;
 }
 
 .viewTopBar .bookTitle {
-    width: calc(100vw - 96px);
+    width: calc(100vw - 100px);
 }
 
 .viewBookCover {

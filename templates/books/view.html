@@ -10,7 +10,10 @@
 <body id="viewBook">
     <div class="accentBox">
         <div class="viewTopBar">
-            <p class="backButton"><a href="/" onclick="window.history.back()">🡸</a></p>
+            <a href="/" onclick="window.history.back()">
+            <svg class="backButton" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/>
+                <path fill="#000" d="M 2,12 8.25,6 h 4.62 l -4.2,4 13.32,0 v 3.974823 l -13.3,0 4.2,4 H 8.25 Z"/>
+            </svg></a>
             <p class="bookTitle center">{{ book.title }}</p>
         </div>
 
