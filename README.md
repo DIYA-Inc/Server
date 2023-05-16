@@ -22,7 +22,7 @@ To stop the server send a KeyboardInterrupt (ctrl + C).
 
 To run the unit tests run:
 
-`./testing.py`
+`./runTests.py`
 
 ## Dependencies
 
